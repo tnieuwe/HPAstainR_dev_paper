@@ -2,6 +2,10 @@
 
 HPAStain.R is an R package/[Shiny app](https://32tim32.shinyapps.io/HPAStainR/) used to query the Human Protein Atlas for staining data. The purpose of this tool is to test if a list of proteins/genes is associated with a certain cell type in a HPA tested tissue. E.g. you have a list of protein coding genes from a differential expression single cell analysis and want to see if these proteins are associated with a known cell type. Instead of querying HPA multiple times you can load your list in HPAStainR which will return a ranked table of the cell types with the most protein staining.
 
+The package has officially been submitted for review at Bioconductor at the following repository: https://github.com/tnieuwe/HPAStainR_package
+
+I am keeping this repository as I believe the README is a useful supplement and this repository holds the data that will be submitted hopefully as a paper.
+
 This is my first time developing a package on Github, any and all feedback is appreciated!
 
 ## Getting Started
