@@ -37,22 +37,48 @@ shiny_HPAStainR <- function(hpa_dat, cancer_dat, cell_type_data = NULL) {
         # List of genes
         sidebarPanel(
           "Provide a list of proteins (genes), of standard human nomenclature, and HPAStain.R will output the cell type they are most associated with based on patterns of staining in the Human Protein Atlas. Check the second tab for information on how often tissues are tested for proteins",
-          textAreaInput("gene_list", "List of Proteins (comma separated, space separated, or line separated):", "PRSS1,PNLIP,CELA3A,PRL"),
+          textAreaInput("gene_list",
+                        "List of Proteins (comma separated, space separated, or line separated):",
+                        "PRSS1,PNLIP,CELA3A,PRL"),
           submitButton(text = "Run HPAStain.R"),
-          downloadButton("downloadData", "Download Output as CSV"),
-          selectInput("tissue_level", "Report tissue source of cell type?", c("Yes", "No")),
-          selectInput("cancer_analysis", "Normal/Cancer Tissue", c("normal", "both", "cancer")),
-          selectInput("percent_or_count", "Report counts, percents or both for expression levels?", c("percent", "count", "both")),
+          downloadButton("downloadData",
+                         "Download Output as CSV"),
+          selectInput("tissue_level",
+                      "Report tissue source of cell type?",
+                      c("Yes", "No")),
+          selectInput("cancer_analysis",
+                      "Normal/Cancer Tissue",
+                      c("normal", "both", "cancer")),
+          selectInput("percent_or_count",
+                      "Report counts, percents or both for expression levels?",
+                      c("percent", "count", "both")),
           # This scales the genes fo the percentage so you don't get 100 enrichment scores for tissues where 1 protein was tested
-          checkboxInput("scale_abundance", "Scale results for proteins that have available data", TRUE),
-          selectInput("stringency", "Confidence level of HPA data", c("Normal", "High", "Low"), selected = "Normal"),
-          checkboxInput("tested_protein_column", "Have a column of tested proteins", TRUE),
-          checkboxInput("stain_gene_results", "Have a column of detected proteins", TRUE),
+          checkboxInput("scale_abundance",
+                        "Scale results for proteins that have available data",
+                        TRUE),
+          selectInput("stringency",
+                      "Confidence level of HPA data",
+                      c("Normal", "High", "Low"),
+                      selected = "Normal"),
+          checkboxInput("tested_protein_column",
+                        "Have a column of tested proteins",
+                        TRUE),
+          checkboxInput("stain_gene_results",
+                        "Have a column of detected proteins",
+                        TRUE),
           checkboxInput("adjusted_pvals", "Include adjusted P-values", TRUE),
           #
-          numericInput("round_to", "Round values to:", value = 2, min = 2, max = 5),
-          checkboxInput("csv_names", "CSV friendly column name format", FALSE),
-          checkboxInput("drop_na_rows_in", "Remove rows with no staining data", FALSE),
+          numericInput("round_to",
+                       "Round values to:",
+                       value = 2,
+                       min = 2,
+                       max = 5),
+          checkboxInput("csv_names",
+                        "CSV friendly column name format",
+                        FALSE),
+          checkboxInput("drop_na_rows_in",
+                        "Remove rows with no staining data",
+                        FALSE),
 
           strong(textOutput("gene_list")),
           p(
@@ -98,7 +124,8 @@ shiny_HPAStainR <- function(hpa_dat, cancer_dat, cell_type_data = NULL) {
       } else {
         cell_type_data <- cell_type_data %>% rename(
           `Cell Type` = tissue_cell, `Proteins Tested` = proteins,
-          `Proteins Detected` = detected, `Ratio of Detected to Tested` = det_o_test
+          `Proteins Detected` = detected,
+          `Ratio of Detected to Tested` = det_o_test
         )
       }
 

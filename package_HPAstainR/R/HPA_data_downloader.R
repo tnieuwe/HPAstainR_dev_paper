@@ -70,7 +70,8 @@ HPA_data_downloader <- function(tissue_type = c("both", "normal", "cancer"),
     if (tissue_type == "both" | tissue_type == "normal") {
       ## Normal tissue
       temp <- tempfile()
-      download.file("https://www.proteinatlas.org/download/normal_tissue.tsv.zip", temp)
+      download.file("https://www.proteinatlas.org/download/normal_tissue.tsv.zip",
+                    temp)
       hpa_dat <- read.table(unz(temp, "normal_tissue.tsv"),
                             header = TRUE,
                             sep = "\t",
