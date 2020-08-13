@@ -1,8 +1,8 @@
 # HPAStain.R
 
-HPAStain.R is an R package/[Shiny app](https://32tim32.shinyapps.io/HPAStainR/) used to query the Human Protein Atlas for staining data. The purpose of this tool is to test if a list of proteins/genes is associated with a certain cell type in a HPA tested tissue. E.g. you have a list of protein coding genes from a differential expression single cell analysis and want to see if these proteins are associated with a known cell type. Instead of querying HPA multiple times you can load your list in HPAStainR which will return a ranked table of the cell types with the most protein staining.
+HPAStain.R is an [R package](https://github.com/tnieuwe/HPAStainR)/[Shiny app](https://32tim32.shinyapps.io/HPAStainR/) used to query the Human Protein Atlas for staining data. The purpose of this tool is to test if a list of proteins/genes is associated with a certain cell type in a HPA tested tissue. E.g. you have a list of protein coding genes from a differential expression single cell analysis and want to see if these proteins are associated with a known cell type. Instead of querying HPA multiple times you can load your list in HPAStainR which will return a ranked table of the cell types with the most protein staining.
 
-The package has officially been submitted for review at Bioconductor at the following repository: https://github.com/tnieuwe/HPAStainR_package
+The package has officially been accepted at Bioconductor, and package deveopment still continues at https://github.com/tnieuwe/HPAStainR.
 
 I am keeping this repository as I believe the README is a useful supplement and this repository holds the data that will be submitted hopefully as a paper.
 
@@ -10,7 +10,7 @@ This is my first time developing a package on Github, any and all feedback is ap
 
 ## Getting Started
 
-HPAStainR in its current form is a online Shiny app and R package. The package is not available on CRAN or Bioconductor, but that is our next step, until then feel free to download the binary from the github or us `devtools` to install it.
+HPAStainR in its current form is a online Shiny app and R package. The package will soon be available on Bioconductor,  until then feel free to install it using `devtools` from its current repository up to date repository https://github.com/tnieuwe/HPAStainR.
 
 Run the below R code to install the package using the `devtools` library.
 
@@ -20,27 +20,28 @@ Run the below R code to install the package using the `devtools` library.
 Another way to use it is go to my shiny app website posted here and above:
 https://32tim32.shinyapps.io/HPAStainR/ 
 
-There is also a brief [vignette](https://htmlpreview.github.io/?https://github.com/32tim32/stainR/blob/master/HPAStainR.html) to get you started with the package as well.
+There is also a brief [vignette](https://htmlpreview.github.io/?https://github.com/tnieuwe/HPAstainR_dev_paper/blob/master/HPAStainR.html) to get you started with the package as well.
 
 ### Prerequisites
 
-The R packages `shiny`, `dplyr`, `stringr`, `tibble`, `tidyr`, and `scales` are required for HPAStainR
-
+Depends: `dplyr` and `tidyr`
+Imports: `utils`, `stats`, `scales`, `stringr`, `tible`, and `shiny`
+Suggests: `knitr`, `qpdf`, `testhat`
 The datasets required are below, but HPAStainR package has a function, `HPA_data_downloader()` that can download them for you either permanently or temporarily (via the `save_file` argument):
 
 Normal Tissue: https://www.proteinatlas.org/download/normal_tissue.tsv.zip
 
 Cancer Tissue: https://www.proteinatlas.org/download/pathology.tsv.zip
 
-*Note*: these are large files but required to run HPAStainR
+*Note*: these are large files but required to run HPAStainR, HPAStainR also has built in functions to do this.
 
 ## Built With
 
-* [Shiny](https://shiny.rstudio.com/) - For the shinyapp UI
 * [dplyr](https://dplyr.tidyverse.org/) - Data.frame manipulation
+* [tidyr](https://tidyr.tidyverse.org/) - For creating tidy data
+* [Shiny](https://shiny.rstudio.com/) - For the shinyapp UI
 * [stringr](https://stringr.tidyverse.org/) - String manipulation
 * [tibble](https://tibble.tidyverse.org/) - For data.frame replacements
-* [tidyr](https://tidyr.tidyverse.org/) - For creating tidy data
 * [Scales](https://www.rdocumentation.org/packages/scales/versions/0.4.1) - Generating percents
 
 ## Authors
@@ -53,6 +54,6 @@ Cancer Tissue: https://www.proteinatlas.org/download/pathology.tsv.zip
 
 * Thank you Stephanie Yang for helpful comments - [syang93](https://github.com/syyang93/)
 * Thank you Matt McCall and Zach Brehm for reviewing the code - [mccallm](https://github.com/mccallm) & [zachbrehm](https://github.com/zachbrehm)
-* HPA for data availability and data structure
+* Human Protein Atlas for data availability and data structure
 * PurpleBooth for the README template - [PurpleBooth](https://gist.github.com/PurpleBooth/)
-* Anyone else who has tested this tool
+* The people at Bioconductor for reviewing my tool
