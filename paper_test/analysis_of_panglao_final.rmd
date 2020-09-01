@@ -16,7 +16,7 @@ library(HPAStainR)
 ```{r}
 
 hpa_dat <- read.table("../normal_tissue.tsv", sep = '\t', header = TRUE, stringsAsFactors = F)
-
+cancer_dat <- HPAStainR::HPA_data_downloader("cancer",save_file = F)
 ```
 
 
@@ -226,7 +226,7 @@ for (cell_type in groupings) {
 }
 
 head(final_df)
-write.csv(final_df, "supplemental_table_1_final_df_output.csv", row.names = F)
+write.csv(final_df, "supplemental_table_4_final_df_output.csv", row.names = F)
 ```
 
 ## PanglaoDB Data summary
@@ -262,9 +262,94 @@ supp_fig_1 <- ggplot(summ_dat, aes(x=genes)) +
 
 supp_fig_1
   
-ggsave("supplemental_figure_1_pangloa_hist.png", width = 8, height = 7)
+ggsave("supplemental_figure_4_pangloa_hist.png", width = 8, height = 7)
 
 ```
+
+Supplemental Table 2-3 
+```{r}
+ ## Make new column combining cell type and tissue
+    hpa_dat_2 <- hpa_dat %>%
+        mutate(Tissue = gsub("[[:digit:]]+", "", Tissue),
+               tissue_cell = paste0(toupper(str_trim(Tissue)),
+                                    " - ",
+                                    Cell.type))
+
+
+low_filter_supp_2   <- hpa_dat_2 %>%
+    select(Gene.name, tissue_cell, Reliability, Level) %>%
+    mutate(stained = ifelse(Level %in% c("Not detected", "N/A"), 0, 1)) %>%
+    group_by(Gene.name) %>% summarise(n(), stain_count = sum(stained)) %>%
+    mutate(stained_per_test = stain_count/ `n()`, filter = "low" ) %>%
+    rename(`Times tested` = `n()`,
+           `Time stained` = stain_count,
+           `Stained per tested Low` = stained_per_test)
+
+low_filter_supp_2 <- low_filter_supp_2 %>%
+  mutate(`Rare Low` = ifelse(`Stained per tested Low` <
+                         quantile(low_filter_supp_2$`Stained per tested Low`, .25),
+                       "yes", "no")) %>%
+  select(Gene.name, `Stained per tested Low`, `Rare Low` ) %>%
+  filter(`Stained per tested Low` != 0)
+
+
+normal_filter_supp_2   <- hpa_dat_2 %>%
+    select(Gene.name, tissue_cell, Reliability, Level) %>%
+    filter(Reliability %in% c("Enhanced", "Supported", "Approved")) %>%
+    mutate(stained = ifelse(Level %in% c("Not detected", "N/A"), 0, 1)) %>%
+    group_by(Gene.name) %>% summarise(n(), stain_count = sum(stained)) %>%
+    mutate(stained_per_test = stain_count/ `n()`, filter = "normal" ) %>%
+    rename(`Times tested` = `n()`,
+           `Time stained` = stain_count,
+           `Stained per tested Normal` = stained_per_test)
+
+normal_filter_supp_2 <- normal_filter_supp_2 %>%
+  mutate(`Rare Normal` = ifelse(`Stained per tested Normal` <
+                         quantile(normal_filter_supp_2$`Stained per tested Normal`, .25),
+                       "yes", "no")) %>%
+  select(Gene.name, `Stained per tested Normal`, `Rare Normal` )
+
+
+high_filter_supp_2   <- hpa_dat_2 %>%
+    select(Gene.name, tissue_cell, Reliability, Level) %>%
+    filter(Reliability %in% c("Enhanced","Approved")) %>%
+    mutate(stained = ifelse(Level %in% c("Not detected", "N/A"), 0, 1)) %>%
+    group_by(Gene.name) %>% summarise(n(), stain_count = sum(stained)) %>%
+    mutate(stained_per_test = stain_count/ `n()`, filter = "high" ) %>%
+    rename(`Times tested` = `n()`,
+           `Time stained` = stain_count,
+           `Stained per tested High` = stained_per_test)
+
+high_filter_supp_2 <- high_filter_supp_2 %>%
+  mutate(`Rare High` = ifelse(`Stained per tested High` <
+                         quantile(high_filter_supp_2$`Stained per tested High`, .25),
+                       "yes", "no")) %>%
+  select(Gene.name, `Stained per tested High`, `Rare High` )
+
+
+supp_table_2 <- left_join(left_join(low_filter_supp_2, normal_filter_supp_2), high_filter_supp_2) %>%
+  mutate_if(is.numeric, round, 3)
+
+
+write.csv(supp_table_2, "supplemental_table_2_gene_rarity.csv", row.names = FALSE)
+####Repeat for cancer
+ 
+cancer_sub_table <- cancer_dat %>%
+  select(Gene.name, Cancer, High, Medium, Low, Not.detected) %>%
+  mutate(stained = High + Medium + Low, tested = stained + Not.detected) %>%
+  group_by(Gene.name) %>%
+  summarise(stained = sum(stained,na.rm = T),
+              tested = sum(tested,na.rm = T)) %>%
+  mutate(`Stained per Tested` = round(stained/tested, 3)) %>%
+  filter(!is.nan(`Stained per Tested`)) 
+  
+cancer_sub_table <- cancer_sub_table %>%
+  mutate(Rare = ifelse(`Stained per Tested` <
+                         quantile(cancer_sub_table$`Stained per Tested`, .25),
+                       "Yes", "No"))
+write.csv(cancer_sub_table, "supplemental_table_3_cancer_gene_rarity.csv", row.names = FALSE)
+```
+
 
 ## HPA Data Summary
 ### Includes Supplemental Figure 2-4 and Supplemental Table 4
@@ -348,7 +433,7 @@ supp_fig_2 <- ggplot(hpa_dat_sum, aes(x=(proteins))) +
 
 supp_fig_2
 
-ggsave("supplemental_figure_2_proteins_tested.png", width = 8, height = 7)
+ggsave("supplemental_figure_1_proteins_tested.png", width = 9, height = 6)
 
 supp_fig_3 <- ggplot(hpa_dat_sum, aes(x=detected)) + 
               geom_histogram(aes(fill = amount_tested),color="black", bins=50) +
@@ -360,7 +445,7 @@ supp_fig_3 <- ggplot(hpa_dat_sum, aes(x=detected)) +
 
 supp_fig_3
 
-ggsave("supplemental_figure_3_proteins_detected.png", width = 8, height = 7)
+ggsave("supplemental_figure_2_proteins_detected.png", width = 9, height = 6)
 
 
 supp_fig_4 <- ggplot(hpa_dat_sum, aes(x=det_o_test)) + 
@@ -373,7 +458,7 @@ supp_fig_4 <- ggplot(hpa_dat_sum, aes(x=det_o_test)) +
 
 supp_fig_4
 
-ggsave("supplemental_figure_4_proteins_detected_divby_tested.png", width = 8, height = 7)
+ggsave("supplemental_figure_3_proteins_detected_divby_tested.png", width = 9, height = 6)
 
 
 hpa_dat_sum_out <- select(hpa_dat_sum,
@@ -382,17 +467,35 @@ hpa_dat_sum_out <- select(hpa_dat_sum,
                           `Detected Proteins` = detected,
                           `Detected Tested Ratio` = det_o_test)
 
-write.csv(hpa_dat_sum_out, "supplemental_table_4_hpa_cell_type_tested_ratio.csv",row.names = F)
+write.csv(hpa_dat_sum_out, "supplemental_table_1_hpa_cell_type_tested_ratio.csv",row.names = F)
 
 
-pdf(file = "Supplemental_Figures.pdf", width = 8.5, height = 7)
-
-supp_fig_1
+pdf(file = "Supplemental_Figures.pdf", width = 9, height = 7)
 supp_fig_2
 supp_fig_3
 supp_fig_4
-
+supp_fig_1
 dev.off()
 ```
 
+Recapitulate McCall experiment, file
+```{r}
+
+file_path <- "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5011060/bin/mmc3.xls"
+
+temp = tempfile(fileext = ".xlsx")
+download.file(file_path, destfile=temp, mode='wb')
+
+lung_clust <- readxl::read_xls(temp)
+
+supp_table_4 <- HPAStainR(lung_clust$`Cluster A`, hpa_dat = hpa_dat, cancer_dat = cancer_dat)
+supp_table_5 <- HPAStainR(lung_clust$`Cluster B`, hpa_dat = hpa_dat, cancer_dat = cancer_dat)
+
+
+supp_table_4
+supp_table_5
+
+write.csv(supp_table_4, "supplemental_table_4_pneumocytes.csv",row.names = F)
+write.csv(supp_table_5, "supplemental_table_5_bronchus.csv", row.names = F)
+```
 
