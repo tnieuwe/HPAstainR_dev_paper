@@ -5,28 +5,88 @@ date: "8/12/2020"
 output: html_document
 ---
 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+## Install HPAStainR and load other packages and functions
+
+```{r results="hide", message=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+# The following initializes usage of Bioc devel
+BiocManager::install(version='devel')
+
+BiocManager::install("HPAStainR")
+
 library(tidyverse)
 library(HPAStainR)
+library(R.utils)
+library(ggpubr)
+getURL <- function(URL, FUN, ..., N.TRIES = 1L) {
+        N.TRIES <- as.integer(N.TRIES)
+        stopifnot(length(N.TRIES) == 1L, !is.na(N.TRIES))
+        
+        while (N.TRIES > 0L) {
+            result <- tryCatch(FUN(URL, ...), error = identity)
+            if (!inherits(result, "error")) 
+                break
+            N.TRIES <- N.TRIES - 1L
+        }
+        
+        if (N.TRIES == 0L) {
+            stop("'getURL()' failed:", "\n  URL: ", URL, "\n  error: ", 
+                conditionMessage(result))
+        }
+        
+        result
+    }
 ```
 
 
-### Load HPA data
+
+## Load HPA data
+
+Using HPAStainR's built in functions
 ```{r}
 
-hpa_dat <- read.table("../normal_tissue.tsv", sep = '\t', header = TRUE, stringsAsFactors = F)
+#hpa_dat <- read.table("../normal_tissue.tsv", sep = '\t', header = TRUE, stringsAsFactors = F)
+hpa_dat <- HPAStainR::HPA_data_downloader("normal",save_file = F)
 cancer_dat <- HPAStainR::HPA_data_downloader("cancer",save_file = F)
 ```
 
 
 
+
 ### Read in PanglaoDB
+
+ + Download the PanglaoDB marker data from their website
+ + Filter to protein coding genes and human relevant data
+
 ```{r read in pangloa data}
-dat <- read.table("PanglaoDB_markers_27_Mar_2020.tsv", sep = "\t", header = T, stringsAsFactors = F)
+
+
+temp <- tempfile()
+getURL(URL = "https://panglaodb.se/markers/PanglaoDB_markers_27_Mar_2020.tsv.gz", 
+    FUN = download.file, destfile = temp)
+dat <- read.table(gunzip(temp, "PanglaoDB_markers_27_Mar_2020.tsv.gz", overwrite = T), sep = "\t",
+                  header = TRUE, stringsAsFactors = FALSE)
+unlink(temp)
+
+
+# download.file("https://panglaodb.se/markers/PanglaoDB_markers_27_Mar_2020.tsv.gz",
+#               "PanglaoDB_markers_27_Mar_2020.tsv.gz")
+# dat <- read.table(gunzip("PanglaoDB_markers_27_Mar_2020.tsv.gz", overwrite = T), sep = "\t",
+#                   header = TRUE, stringsAsFactors = FALSE)
+
+
+#dat <- read.table("PanglaoDB_markers_27_Mar_2020.tsv", sep = "\t", header = T, stringsAsFactors = F)
 
 #See data organization
-head(dat)
+knitr::kable(head(tibble(dat)))
 
 #Remove mouse data, product description, and nickname column
 dat <- dat %>% select(-ends_with("mouse"), -nicknames, -product.description) %>%
@@ -43,6 +103,16 @@ dat <- dat %>% select(-ends_with("mouse"), -nicknames, -product.description) %>%
 ```
 
 ## The for loop that runs PanglaoDB through HPAStainR
+
+Below is the main experiment which is a for loop which does the following
+
+ + Selects a cell type from PanglaoDB
+ + Runs the cell type's gene list through HPAStainR's main function only using normal tissue
+ + Take top results from the output and save them
+ + Then find and save the top result for the specific organ of interest (the organ where the cell type comes from). When an exact match fails to exist a pathologist selected the closest possible tissue.
+ + Generate the confidence score
+ + Write out results to a csv file 
+ 
 ```{r }
 
 #Get a list of panglao cell types
@@ -225,7 +295,7 @@ for (cell_type in groupings) {
   final_df <- rbind(final_df, temp_dat)
 }
 
-head(final_df)
+knitr::kable(head(final_df))
 write.csv(final_df, "extended_table_4_final_df_output.csv", row.names = F)
 ```
 
@@ -253,22 +323,22 @@ summ_dat <- dat %>% group_by(cell.type) %>% summarize(genes = n())
 
 summary(summ_dat)
 ticks <- c(1, 50, 100, 150, 200)
-supp_fig_1 <- ggplot(summ_dat, aes(x=genes)) + 
-                geom_histogram(color="black", fill="white") +
+ext_fig_4 <- ggplot(summ_dat, aes(x=genes)) + 
+                geom_histogram(color="black", fill="white", bins = 30) +
                 xlab("Marker Genes Per Cell Type") + 
                 labs(title ="PanglaoDB Markers per Cell Type",
-                     subtitle =  paste("N = ", nrow(summ_dat))) +
+                     subtitle =  paste("N = ", nrow(summ_dat),"; bins = 30")) +
                 ylab("Count of Cell Types") +
                 theme_classic() + scale_x_continuous(breaks=ticks)
 
-supp_fig_1
+ext_fig_4
   
-ggsave("extended_figure_4_pangloa_hist.png", width = 8, height = 7)
+ggsave("data_out/extended_figure_3_pangloa_hist.png", width = 8, height = 7)
 
 ```
 
 extended Table 2-3 
-```{r}
+```{r message=FALSE}
  ## Make new column combining cell type and tissue
     hpa_dat_2 <- hpa_dat %>%
         mutate(Tissue = gsub("[[:digit:]]+", "", Tissue),
@@ -357,13 +427,28 @@ quantile(supp_table_2$`Stained per tested Normal`, .25, na.rm = T)
 quantile(supp_table_2$`Stained per tested High`, .25, na.rm = T)  
   
 
-table(supp_table_2$`Rare Low`)
-table(supp_table_2$`Rare Normal`)
-table(supp_table_2$`Rare High`)
-table(cancer_sub_table$Rare)
+rarity_table  <- rbind(table(supp_table_2$`Rare Low`),
+table(supp_table_2$`Rare Normal`),
+table(supp_table_2$`Rare High`),
+table(cancer_sub_table$Rare))
+
+rownames(rarity_table) <- c("Low Filter", "Normal Filter", "High Filter", "Cancer")
+
+title <- paste0(
+"Number of Rare Proteins per Filtration Level"
+) %>%
+  strwrap(width = 25) %>%
+  paste(collapse = "\n")
+
+
+ggtexttable(rarity_table) %>%
+  tab_add_title(text = title, face = "bold", padding = unit(0.1, "line"))
+  
 ```
-Make extended tables for genes
-```{r}
+
+This is a visualization of the data generated from the tables above to get a sense of the rarity of different proteins and their distribution of staining frequency. These are extended Figures 3B and 4B.
+
+```{r message=FALSE}
 library(reshape2)
 
 normal_gene_df <- supp_table_2 %>% select(Gene.name,
@@ -375,7 +460,7 @@ normal_gene_df <- supp_table_2 %>% select(Gene.name,
 normal_gene_df_melt <- melt(normal_gene_df)
 
 
-normal_gene_plot <- ggplot(normal_gene_df_melt, aes(x = value, fill = variable)) +
+ext_fig_2b <- ggplot(normal_gene_df_melt, aes(x = value, fill = variable)) +
   geom_histogram(position="dodge", alpha=0.5, color = "black", bins=30) +
   geom_vline(xintercept = c(quantile(normal_gene_df$Low, .25, na.rm = TRUE),
                             quantile(normal_gene_df$Normal, .25, na.rm = TRUE),
@@ -385,30 +470,36 @@ normal_gene_plot <- ggplot(normal_gene_df_melt, aes(x = value, fill = variable))
              size = 1) +
             scale_x_continuous(labels = scales::percent) +
   labs(title = "HPA Ratio of Protein Staining to Protein Histological Scoring",
-       subtitle = "Lines represent 1st quartile for each distribution") +
+       subtitle = paste("Lines represent 1st quartile for each distribution","; bins = 30")) +
   xlab("Percent of Cells that a Protein has Stained in") +
   ylab("Count of Proteins") +
   scale_fill_discrete(name="Scoring Quality Stringency") +
   theme_classic() +
   theme(legend.position = "top")
 
-normal_gene_plot
+ext_fig_2b
+ggsave("data_out/extended_fig_2b.png")
 
-cancer_gene_plot <- ggplot(cancer_sub_table, aes(x = `Stained per Tested`)) +
+## For cancer below
+
+ext_fig_3b <- ggplot(cancer_sub_table, aes(x = `Stained per Tested`)) +
   geom_histogram(fill = "white", color = "black") +
   geom_vline(xintercept = quantile(cancer_sub_table$`Stained per Tested`,
                                    .25, na.rm = TRUE)) +
             scale_x_continuous(labels = scales::percent) +
   labs(title = "HPA Cancer Ratio of Protein Staining to Protein Histological Scoring",
-       subtitle = "Line represents 1st quartile the distribution") +
+       subtitle = paste("Line represents 1st quartile the distribution","; bins = 30")) +
   xlab("Percent of Cancers that a Protein has Stained in") +
   ylab("Count of Proteins") +
   theme_classic()
+ext_fig_3b
+ggsave("data_out/extended_fig_3b.png")
 
-cancer_gene_plot
 ```
-Make the boxplot for normal tissue and cancer
-```{r}
+
+Here we generate a boxplot for normal data and cancer data showing the distribution of how many cell types proteins were evaluated in, based on where they are in the above bins made by the histogram. These are Extended Figure 2 and 3 A.
+
+```{r message=FALSE}
 normal_melt <- normal_gene_df_melt %>% filter(variable == "Normal") %>% arrange(desc(value)) %>% drop_na()
 normal_melt$bins <- cut(normal_melt$value, breaks = 30)
 
@@ -430,14 +521,14 @@ normal_bins <- left_join(normal_prot_test, normal_melt) %>% drop_na()
 #Rename bins
 
 
-bins_plot <- ggplot(normal_bins, aes(bins, `Times tested`)) +
+ext_fig_2a <- ggplot(normal_bins, aes(bins, `Times tested`)) +
   geom_boxplot() +
  scale_x_discrete(labels = as.character(1:30)) +
   ylab("N of cell types proteins have been evaluated in") +
   theme_classic()
   
-
-
+ext_fig_2a
+ggsave("data_out/extended_fig_2a.png")
 
 #### With cancer
 
@@ -446,21 +537,26 @@ cancer_melt <- cancer_sub_table %>%
   drop_na()
 cancer_melt$bins <- cut(cancer_melt$`Stained per Tested`, breaks = 30)
 
-cbins_plot <- ggplot(cancer_melt, aes(bins, tested)) +
+ext_fig_3a <- ggplot(cancer_melt, aes(bins, tested)) +
   geom_boxplot() +
  scale_x_discrete(labels = as.character(1:30)) +
   #coord_flip() +
   ylab("N of cancers proteins have been evaluated in") +
   theme_classic()
 
+ext_fig_3a
+ggsave("data_out/extended_fig_3a.png")
 
 ```
 
 
 
 ## HPA Data Summary
-### Includes extended Figure 2-4 and extended Table 4
-```{r}
+### Includes Extended Figure 1 A-C, Extended Figure 3 and extended Table 4
+
+
+Preparing the data
+```{r message=FALSE}
 
 
 #Generate data to gain an understanding of the amount of proteins tested to the amount of proteins stained
@@ -497,11 +593,15 @@ stat_mode <- function(v) {
 
 stat_mode(hpa_dat_sum$proteins)
 summary(hpa_dat_sum$proteins)
+```
 
+
+Extended Figure 1A
+```{r}
 ticks <- c(1, 5000, 10000, 15000)
 
 
-supp_fig_2 <- ggplot(hpa_dat_sum, aes(x=(proteins), fill = amount_tested)) + 
+ext_fig_1a <- ggplot(hpa_dat_sum, aes(x=(proteins), fill = amount_tested)) + 
               geom_histogram(color="black", bins=100) +
               xlab("Scored Proteins Per Cell Type") +
               labs( title ="HPA Count of Histologically Scored Proteins per Cell Type",
@@ -536,38 +636,50 @@ supp_fig_2 <- ggplot(hpa_dat_sum, aes(x=(proteins), fill = amount_tested)) +
               scale_x_continuous(breaks=ticks)
                     
 
-supp_fig_2
+ext_fig_1a
 
-ggsave("extended_figure_1_proteins_tested.png", width = 9, height = 6)
+ggsave("data_out/extended_figure_1a_proteins_tested.png", width = 9, height = 6)
+
+```
+
+
+```{r}
+
 ticks <- c(1, 4000, 8000, 12000)
-supp_fig_3 <- ggplot(hpa_dat_sum, aes(x=detected)) + 
+ext_fig_1b <- ggplot(hpa_dat_sum, aes(x=detected)) + 
               geom_histogram(aes(fill = amount_tested),color="black", bins=50) +
               xlab("Count of Positively Staining Proteins Per Cell Type") +
               labs(title="HPA Detected Proteins",
-              subtitle =paste("N = ", nrow(hpa_dat_sum))) +
+              subtitle = paste("N = ", nrow(hpa_dat_sum), "; bins = 50")) +
               ylab("Count of Cell Types") + 
               scale_fill_discrete(name="Number of Proteins Histologically Score")+ theme_classic() +
               scale_x_continuous(breaks=ticks)
 
-supp_fig_3
+ext_fig_1b
 
-ggsave("extended_figure_2_proteins_detected.png", width = 9, height = 6)
+ggsave("data_out/extended_figure_1b_proteins_detected.png", width = 9, height = 6)
+```
 
 
-supp_fig_4 <- ggplot(hpa_dat_sum, aes(x=det_o_test)) + 
-              geom_histogram(aes(fill =amount_tested), color="black") +
+```{r }
+
+ext_fig_1c <- ggplot(hpa_dat_sum, aes(x=det_o_test)) + 
+              geom_histogram(aes(fill =amount_tested), color="black", bins = 30) +
               xlab("Percent of Detected to Evaluated Proteins per Cell Type") +
               labs(title="HPA Detected/Histologically Scored Proteins",
-                   subtitle = paste("N = ", nrow(hpa_dat_sum))) +
+                   subtitle = paste("N = ", nrow(hpa_dat_sum),"; bins = 30")) +
               ylab("Count of Cell Types") + 
               scale_fill_discrete(name="Number of Proteins Scored") +
               theme_classic() +
               scale_x_continuous(labels = scales::percent)
 
-supp_fig_4
+ext_fig_1c
 
-ggsave("extended_figure_3_proteins_detected_divby_tested.png", width = 9, height = 6)
+ggsave("extended_figure_1c_proteins_detected_divby_tested.png", width = 9, height = 6)
+```
 
+Extended Table 1
+```{r}
 
 hpa_dat_sum_out <- select(hpa_dat_sum,
                           `Cell Type` = tissue_cell,
@@ -576,17 +688,20 @@ hpa_dat_sum_out <- select(hpa_dat_sum,
                           `Detected Tested Ratio` = det_o_test)
 
 write.csv(hpa_dat_sum_out, "extended_table_1_hpa_cell_type_tested_ratio.csv",row.names = F)
+```
 
+Writing out all of the plots
+```{r}
 
 cairo_pdf(filename = "extended_Figures.pdf", width = 8, height = 5, onefile=T)
-supp_fig_2
-supp_fig_3
-supp_fig_4
-bins_plot
-normal_gene_plot
-cbins_plot
-cancer_gene_plot
-supp_fig_1
+ext_fig_1a
+ext_fig_1b
+ext_fig_1c
+ext_fig_2a
+ext_fig_2b
+ext_fig_3a
+ext_fig_3b
+ext_fig_4
 dev.off()
 
 ticks <- c(1, 4000, 8000, 12000)
