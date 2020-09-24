@@ -1,0 +1,59 @@
+
+
+
+
+
+Analysis Type:	PANTHER Overrepresentation Test (Released 20200407)
+Annotation Version and Release Date:	GO Ontology database DOI:  10.5281/zenodo.3727280 Released 2020-03-23
+Analyzed List:	upload_1 (Homo sapiens)
+Reference List:	Homo sapiens (all genes in database)
+Test Type:	FISHER
+Correction:	FDR
+GO biological process complete	Homo sapiens - REFLIST (20851)	upload_1 (49)	upload_1 (expected)	upload_1 (over/under)	upload_1 (fold Enrichment)	upload_1 (raw P-value)	upload_1 (FDR)
+induction of bacterial agglutination (GO:0043152)	6	3	.01	+	 > 100	1.01E-06	2.30E-03
+plasminogen activation (GO:0031639)	11	3	.03	+	 > 100	4.33E-06	7.68E-03
+macrophage chemotaxis (GO:0048246)	14	3	.03	+	91.19	8.05E-06	9.17E-03
+macrophage migration (GO:1905517)	19	3	.04	+	67.19	1.81E-05	1.25E-02
+fibrinolysis (GO:0042730)	20	3	.05	+	63.83	2.08E-05	1.27E-02
+transcytosis (GO:0045056)	21	3	.05	+	60.79	2.37E-05	1.35E-02
+blood coagulation, fibrin clot formation (GO:0072378)	26	3	.06	+	49.10	4.24E-05	2.05E-02
+protein activation cascade (GO:0072376)	26	3	.06	+	49.10	4.24E-05	1.99E-02
+respiratory gaseous exchange by respiratory system (GO:0007585)	48	5	.11	+	44.33	1.51E-07	8.06E-04
+negative regulation of blood coagulation (GO:0030195)	51	4	.12	+	33.37	8.33E-06	8.31E-03
+negative regulation of hemostasis (GO:1900047)	52	4	.12	+	32.73	8.95E-06	8.41E-03
+negative regulation of coagulation (GO:0050819)	56	4	.13	+	30.40	1.18E-05	9.42E-03
+negative regulation of response to wounding (GO:1903035)	93	6	.22	+	27.45	1.15E-07	9.17E-04
+negative regulation of wound healing (GO:0061045)	78	5	.18	+	27.28	1.45E-06	2.90E-03
+fatty acid transport (GO:0015908)	72	4	.17	+	23.64	3.02E-05	1.56E-02
+toll-like receptor signaling pathway (GO:0002224)	99	5	.23	+	21.49	4.44E-06	7.08E-03
+regulation of blood coagulation (GO:0030193)	82	4	.19	+	20.76	4.92E-05	2.18E-02
+regulation of hemostasis (GO:1900046)	83	4	.20	+	20.51	5.14E-05	2.16E-02
+regulation of coagulation (GO:0050818)	88	4	.21	+	19.34	6.40E-05	2.62E-02
+pattern recognition receptor signaling pathway (GO:0002221)	121	5	.28	+	17.58	1.13E-05	9.52E-03
+regulation of response to wounding (GO:1903034)	183	6	.43	+	13.95	5.11E-06	6.80E-03
+regulation of wound healing (GO:0061041)	153	5	.36	+	13.91	3.38E-05	1.69E-02
+organic acid transport (GO:0015849)	289	8	.68	+	11.78	4.12E-07	1.64E-03
+carboxylic acid transport (GO:0046942)	289	8	.68	+	11.78	4.12E-07	1.31E-03
+positive regulation of protein secretion (GO:0050714)	285	7	.67	+	10.45	5.03E-06	7.29E-03
+positive regulation of peptide secretion (GO:0002793)	308	7	.72	+	9.67	8.25E-06	8.78E-03
+lipid transport (GO:0006869)	301	6	.71	+	8.48	7.86E-05	3.06E-02
+positive regulation of secretion by cell (GO:1903532)	425	8	1.00	+	8.01	6.82E-06	8.37E-03
+lipid localization (GO:0010876)	330	6	.78	+	7.74	1.29E-04	4.47E-02
+positive regulation of secretion (GO:0051047)	452	8	1.06	+	7.53	1.06E-05	9.39E-03
+organic anion transport (GO:0015711)	461	8	1.08	+	7.38	1.22E-05	9.26E-03
+regulation of protein secretion (GO:0050708)	489	8	1.15	+	6.96	1.85E-05	1.23E-02
+regulation of peptide secretion (GO:0002791)	519	8	1.22	+	6.56	2.81E-05	1.50E-02
+positive regulation of protein transport (GO:0051222)	464	7	1.09	+	6.42	1.07E-04	4.07E-02
+positive regulation of establishment of protein localization (GO:1904951)	480	7	1.13	+	6.21	1.32E-04	4.47E-02
+negative regulation of response to external stimulus (GO:0032102)	565	8	1.33	+	6.03	5.09E-05	2.20E-02
+anion transport (GO:0006820)	586	8	1.38	+	5.81	6.55E-05	2.61E-02
+regulation of secretion by cell (GO:1903530)	783	10	1.84	+	5.43	1.25E-05	9.09E-03
+regulation of secretion (GO:0051046)	837	10	1.97	+	5.08	2.21E-05	1.31E-02
+positive regulation of transport (GO:0051050)	1021	10	2.40	+	4.17	1.16E-04	4.11E-02
+regulation of transport (GO:0051049)	1906	15	4.48	+	3.35	2.06E-05	1.32E-02
+positive regulation of multicellular organismal process (GO:0051240)	1783	14	4.19	+	3.34	4.34E-05	1.98E-02
+regulation of localization (GO:0032879)	2838	21	6.67	+	3.15	5.48E-07	1.46E-03
+positive regulation of cell communication (GO:0010647)	1943	14	4.57	+	3.07	1.10E-04	4.08E-02
+positive regulation of signaling (GO:0023056)	1951	14	4.58	+	3.05	1.15E-04	4.17E-02
+multicellular organismal process (GO:0032501)	7037	36	16.54	+	2.18	1.79E-08	2.86E-04
+response to stimulus (GO:0050896)	8572	35	20.14	+	1.74	2.75E-05	1.51E-02

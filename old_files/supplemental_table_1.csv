@@ -1,0 +1,145 @@
+cell_type,conf_score,proteins_used,top_10_avg_prot_tested,top_result,top_enrich,top_pval,top_adj_pval,top_tiss_result,top_tiss_enrich,top_tiss_pval,top_tiss_adj_pval
+KIDNEY proximal tubule cells,70.5,76,53.83333333,KIDNEY - cells in tubules,70.5,0.00049975,0.042478761,KIDNEY - cells in tubules,70.5,0.00049975,0.042478761
+HEART MUSCLE cardiomyocytes,66,104,60,HEART MUSCLE - myocytes,66,0.00049975,0.03898051,HEART MUSCLE - myocytes,66,0.00049975,0.03898051
+IMMUNE SYSTEM neutrophils,62.5,69,40,BONE MARROW - hematopoietic cells,62.5,0.00049975,0.036981509,BONE MARROW - hematopoietic cells,62.5,0.00049975,0.036981509
+IMMUNE SYSTEM monocytes,60.25,99,55,BONE MARROW - hematopoietic cells,60.25,0.00049975,0.036981509,BONE MARROW - hematopoietic cells,60.25,0.00049975,0.036981509
+PANCREAS acinar cells,60.24,48,36,PANCREAS - exocrine glandular cells,62.75,0.00049975,0.037481259,PANCREAS - exocrine glandular cells,62.75,0.00049975,0.037481259
+IMMUNE SYSTEM b cells,59.5,89,51.5,TONSIL - non-germinal center cells,59.5,0.00049975,0.037481259,TONSIL - non-germinal center cells,59.5,0.00049975,0.037481259
+SKIN keratinocytes,56.4,48,32,SKIN - epidermal cells,58.75,0.00049975,0.03898051,SKIN - epidermal cells,58.75,0.00049975,0.03898051
+SKELETAL MUSCLE myocytes,54.75,88,54,SKELETAL MUSCLE - myocytes,54.75,0.00049975,0.036981509,SKELETAL MUSCLE - myocytes,54.75,0.00049975,0.036981509
+MAMMARY GLAND luminal epithelial cells,53.04,48,30.33333333,NASOPHARYNX - respiratory epithelial cells,55.25,1,1,BREAST - glandular cells,38.75,0.001999,0.143928036
+LIVER hepatocytes,51.75,148,86.83333333,LIVER - hepatocytes,51.75,0.00049975,0.036981509,LIVER - hepatocytes,51.75,0.00049975,0.036981509
+KIDNEY distal tubule cells,51.45,42,19.83333333,KIDNEY - cells in tubules,61.25,0.00049975,0.036981509,KIDNEY - cells in tubules,61.25,0.00049975,0.036981509
+BRAIN microglia,51,71,34,BONE MARROW - hematopoietic cells,51,0.00049975,0.036981509,CEREBRAL CORTEX - neuronal cells,14.25,0.609695152,1
+IMMUNE SYSTEM gamma delta t cells,50.895,39,25.5,BONE MARROW - hematopoietic cells,65.25,0.00049975,0.036981509,BONE MARROW - hematopoietic cells,65.25,0.00049975,0.036981509
+LIVER cholangiocytes,50.82,42,30.83333333,GALLBLADDER - glandular cells,60.5,0.00049975,0.036981509,LIVER - bile duct cells,15,0.033983008,1
+OLFACTORY SYSTEM olfactory epithelial cells,49.75,131,34.66666667,FALLOPIAN TUBE - glandular cells,49.75,0.00049975,0.045977011,tissue not found,NA,NA,NA
+BLOOD erythroid-like and erythroid precursor cells,49.5,51,28,BONE MARROW - hematopoietic cells,49.5,0.00049975,0.036981509,BONE MARROW - hematopoietic cells,49.5,0.00049975,0.036981509
+IMMUNE SYSTEM macrophages,49.5,128,54.5,BONE MARROW - hematopoietic cells,49.5,0.00049975,0.036981509,BONE MARROW - hematopoietic cells,49.5,0.00049975,0.036981509
+IMMUNE SYSTEM nk cells,49.5,79,35,SPLEEN - cells in red pulp,49.5,0.00049975,0.036981509,TONSIL - non-germinal center cells,47.25,0.00049975,0.036981509
+GI TRACT goblet cells,49.175,35,22,RECTUM - glandular cells,70.25,0.00049975,0.036981509,RECTUM - glandular cells,70.25,0.00049975,0.036981509
+PANCREAS beta cells,48.75,50,23,PANCREAS - islets of Langerhans,48.75,0.00049975,0.04147926,PANCREAS - islets of Langerhans,48.75,0.00049975,0.04147926
+PANCREAS delta cells,47.85,33,10,PANCREAS - islets of Langerhans,72.5,0.00049975,0.03948026,PANCREAS - islets of Langerhans,72.5,0.00049975,0.03948026
+SKIN melanocytes,47.8,40,21.5,SKIN - melanocytes,59.75,0.00049975,0.046476762,SKIN - melanocytes,59.75,0.00049975,0.046476762
+BLOOD platelets,47.5,130,63.66666667,BONE MARROW - hematopoietic cells,47.5,0.00049975,0.037481259,BONE MARROW - hematopoietic cells,47.5,0.00049975,0.037481259
+KIDNEY podocytes,47.5,94,32,KIDNEY - cells in glomeruli,47.5,0.00049975,0.04097951,KIDNEY - cells in glomeruli,47.5,0.00049975,0.04097951
+LIVER kupffer cells,47.475,45,17.83333333,LUNG - macrophages,52.75,0.00049975,0.036981509,LIVER - hepatocytes,10.5,1,1
+IMMUNE SYSTEM plasmacytoid dendritic cells,46.25,55,30,TONSIL - non-germinal center cells,46.25,0.00049975,0.03848076,TONSIL - non-germinal center cells,46.25,0.00049975,0.03848076
+KIDNEY loop of henle cells,45,53,17,KIDNEY - cells in tubules,45,0.00149925,0.110944528,KIDNEY - cells in tubules,45,0.00149925,0.110944528
+BRAIN neurons,45,200,82,CEREBRAL CORTEX - neuronal cells,45,0.00049975,0.045977011,CEREBRAL CORTEX - neuronal cells,45,0.00049975,0.045977011
+IMMUNE SYSTEM megakaryocytes,44.88,48,27.83333333,BONE MARROW - hematopoietic cells,46.75,0.00049975,0.04147926,BONE MARROW - hematopoietic cells,46.75,0.00049975,0.04147926
+IMMUNE SYSTEM dendritic cells,44.25,121,74.83333333,LYMPH NODE - non-germinal center cells,44.25,0.00049975,0.036981509,LYMPH NODE - non-germinal center cells,44.25,0.00049975,0.036981509
+IMMUNE SYSTEM plasma cells,44,67,38.5,TONSIL - non-germinal center cells,44,0.00049975,0.04047976,TONSIL - non-germinal center cells,44,0.00049975,0.04047976
+BRAIN retinal ganglion cells,43.5,68,16.83333333,CEREBELLUM - Purkinje cells,43.5,0.030984508,1,CEREBELLUM - Purkinje cells,43.5,0.030984508,1
+CONNECTIVE TISSUE fibroblasts,42.57,43,23,PLACENTA - decidual cells,49.5,1,1,SOFT TISSUE - fibroblasts,33.5,1,1
+KIDNEY principal cells,41.79,42,23,KIDNEY - cells in tubules,49.75,0.00049975,0.036981509,KIDNEY - cells in tubules,49.75,0.00049975,0.036981509
+BRAIN cajal-retzius cells,41.75,77,24,CEREBRAL CORTEX - neuronal cells,41.75,0.00049975,0.037981009,CEREBRAL CORTEX - neuronal cells,41.75,0.00049975,0.037981009
+PANCREAS ductal cells,41.71,43,36,GALLBLADDER - glandular cells,48.5,0.00049975,0.036981509,PANCREAS - exocrine glandular cells,33.75,0.00049975,0.036981509
+EPITHELIUM mesothelial cells,40.5,52,23.16666667,FALLOPIAN TUBE - glandular cells,40.5,0.013993003,0.993503248,tissue not found,NA,NA,NA
+SKELETAL MUSCLE myoblasts,39.6,33,9.833333333,SKELETAL MUSCLE - myocytes,60,0.00049975,0.036981509,SKELETAL MUSCLE - myocytes,60,0.00049975,0.036981509
+ZYGOTE embryonic stem cells,39,83,39.66666667,NASOPHARYNX - respiratory epithelial cells,39,0.612693653,1,tissue not found,NA,NA,NA
+BRAIN purkinje neurons,39,59,32.5,CAUDATE - neuronal cells,39,0.00049975,0.042978511,CAUDATE - neuronal cells,39,0.00049975,0.042978511
+MAMMARY GLAND mammary epithelial cells,38.7,43,28,SALIVARY GLAND - glandular cells,45,0.283858071,1,BREAST - glandular cells,39,0.008495752,0.637181409
+REPRODUCTIVE leydig cells,36.75,54,16,ADRENAL GLAND - glandular cells,36.75,0.00049975,0.044977511,OVARY - follicle cells,4.5,0.335332334,1
+VASCULATURE endothelial cells,36.5,185,70.66666667,COLON - endothelial cells,36.5,0.00049975,0.03898051,tissue not found,NA,NA,NA
+BRAIN interneurons,36.25,216,84.83333333,CEREBRAL CORTEX - neuronal cells,36.25,0.00049975,0.049975012,CEREBRAL CORTEX - neuronal cells,36.25,0.00049975,0.049975012
+EYE photoreceptor cells,36,53,20.33333333,RETINA - cells in photoreceptor layer ,36,1,1,RETINA - cells in photoreceptor layer ,36,1,1
+KIDNEY transient cells,35.64,22,8,KIDNEY - cells in tubules,81,0.205897051,1,KIDNEY - cells in tubules,81,0.205897051,1
+BONE hematopoietic stem cells,35.5,88,39.83333333,KIDNEY - cells in tubules,35.5,0.703648176,1,BONE MARROW - hematopoietic cells,34.25,0.00049975,0.037481259
+BRAIN anterior pituitary gland cells,35.31,33,13.16666667,PITUITARY GLAND - cells in anterior ,53.5,1,1,PITUITARY GLAND - cells in anterior ,53.5,1,1
+PANCREAS alpha cells,34.8,48,19.83333333,PANCREAS - islets of Langerhans,36.25,0.00049975,0.042478761,PANCREAS - islets of Langerhans,36.25,0.00049975,0.042478761
+SKELETAL MUSCLE satellite cells,34.615,43,19,NASOPHARYNX - respiratory epithelial cells,40.25,1,1,SKELETAL MUSCLE - myocytes,27,0.066466767,1
+VASCULATURE endothelial cells (aorta),34.25,89,23,PLACENTA - trophoblastic cells,34.25,0.029485257,1,COLON - endothelial cells,33.5,0.094952524,1
+KIDNEY intercalated cells,34,25,11,KIDNEY - cells in tubules,68,0.00049975,0.036981509,KIDNEY - cells in tubules,68,0.00049975,0.036981509
+KIDNEY mesangial cells,33.75,57,24,KIDNEY - cells in glomeruli,33.75,0.00049975,0.037981009,KIDNEY - cells in glomeruli,33.75,0.00049975,0.037981009
+BRAIN trigeminal neurons,33.75,45,17.66666667,CEREBRAL CORTEX - neuropil,37.5,0.017491254,1,CEREBRAL CORTEX - neuropil,37.5,0.017491254,1
+EMBRYO trophoblast cells,33.17,31,16,PLACENTA - trophoblastic cells,53.5,0.00049975,0.042978511,tissue not found,NA,NA,NA
+BRAIN neural stem/precursor cells,33,57,18.83333333,CEREBRAL CORTEX - neuronal cells,33,0.637181409,1,CEREBRAL CORTEX - neuronal cells,33,0.637181409,1
+LUNG pulmonary alveolar type ii cells,32.955,39,26.83333333,LUNG - pneumocytes,42.25,0.00049975,0.036981509,LUNG - pneumocytes,42.25,0.00049975,0.036981509
+LIVER hepatic stellate cells,32.625,45,17.66666667,SMOOTH MUSCLE - smooth muscle cells,36.25,0.00149925,0.110944528,LIVER - hepatocytes,11.75,0.391804098,1
+GI TRACT microfold cells,30.15,30,19,GALLBLADDER - glandular cells,50.25,0.143928036,1,DUODENUM - glandular cells,34.25,1,1
+BRAIN pyramidal cells,28.875,35,20,HIPPOCAMPUS - neuronal cells,41.25,0.00049975,0.04097951,HIPPOCAMPUS - neuronal cells,41.25,0.00049975,0.04097951
+REPRODUCTIVE luteal cells,28.35,27,10,ADRENAL GLAND - glandular cells,52.5,0.04047976,1,OVARY - ovarian stroma cells,20,1,1
+BRAIN astrocytes,28.25,63,35,CEREBRAL CORTEX - glial cells,28.25,0.0009995,0.084957521,CEREBRAL CORTEX - glial cells,28.25,0.0009995,0.084957521
+LUNG ciliated cells,28.2,15,7.833333333,BRONCHUS - respiratory epithelial cells,94,0.00049975,0.036981509,LUNG - macrophages,3,1,1
+GI TRACT foveolar cells,28.14,21,18,STOMACH - glandular cells,67,0.00049975,0.036981509,SMALL INTESTINE - glandular cells,35,0.621189405,1
+BRAIN immature neurons,27.93,38,14,CEREBELLUM - cells in granular layer,36.75,0.00049975,0.03898051,CEREBELLUM - cells in granular layer,36.75,0.00049975,0.03898051
+BRAIN bergmann glia,27.88,41,23,CEREBRAL CORTEX - neuropil,34,0.00049975,0.036981509,CEREBRAL CORTEX - neuropil,34,0.00049975,0.036981509
+BRAIN pinealocytes,27.84,24,10.66666667,RETINA - cells in photoreceptor layer ,58,0.430284858,1,CAUDATE - neuronal cells,4,0.613193403,1
+IMMUNE SYSTEM mast cells,27.5,142,49,BONE MARROW - hematopoietic cells,27.5,0.00049975,0.03898051,BONE MARROW - hematopoietic cells,27.5,0.00049975,0.03898051
+EYE mã¼ller cells,27.5,50,28,STOMACH - glandular cells,27.5,0.411794103,1,RETINA - cells in inner nuclear layer ,6,0.066466767,1
+SKIN langerhans cells,27.3,26,17,TONSIL - non-germinal center cells,52.5,0.00049975,0.036981509,SKIN - Langerhans,51.5,0.00049975,0.036981509
+IMMUNE SYSTEM natural killer t cells,27.255,23,14,TONSIL - non-germinal center cells,59.25,0.00049975,0.036981509,TONSIL - non-germinal center cells,59.25,0.00049975,0.036981509
+LUNG airway goblet cells,27.25,25,15,STOMACH - glandular cells,54.5,0.00049975,0.036981509,LUNG - pneumocytes,11.5,1,1
+SMOOTH MUSCLE myoepithelial cells,26.26,26,20.66666667,BREAST - myoepithelial cells,50.5,0.00049975,0.037481259,SMOOTH MUSCLE - smooth muscle cells,30,0.00049975,0.037481259
+BRAIN schwann cells,26.23,43,25.66666667,CAUDATE - glial cells,30.5,0.100449775,1,CAUDATE - glial cells,30.5,0.100449775,1
+LUNG pulmonary alveolar type i cells,26.01,34,15,LUNG - pneumocytes,38.25,0.060969515,1,LUNG - pneumocytes,38.25,0.060969515,1
+CONNECTIVE TISSUE chondrocytes,26,51,23.5,TONSIL - squamous epithelial cells,26,1,1,SOFT TISSUE - chondrocytes,22,0.0009995,0.086956522
+CONNECTIVE TISSUE adipocytes,25.5,116,41,PLACENTA - trophoblastic cells,25.5,0.027986007,1,ADIPOSE TISSUE - adipocytes,24.25,0.00049975,0.04197901
+CONNECTIVE TISSUE adipocyte progenitor cells,25.3,23,5,PLACENTA - trophoblastic cells,55,0.117941029,1,ADIPOSE TISSUE - adipocytes,15,1,1
+GI TRACT tuft cells,25.08,33,16.83333333,DUODENUM - glandular cells,38,0.017491254,1,DUODENUM - glandular cells,38,0.017491254,1
+BRAIN neuroendocrine cells,24.3,27,10,CEREBRAL CORTEX - neuronal cells,45,0.00049975,0.04097951,CEREBRAL CORTEX - neuronal cells,45,0.00049975,0.04097951
+BRAIN neuroblasts,23.5,50,19,DUODENUM - glandular cells,23.5,1,1,CEREBRAL CORTEX - neuropil,22.75,0.103448276,1
+THYMUS thymocytes,23.32,22,16,LYMPH NODE - non-germinal center cells,53,0.00049975,0.037481259,THYMUS - cortical cells,3,NA,NA
+SKIN merkel cells,23.2,16,9,SMALL INTESTINE - glandular cells,72.5,0.102448776,1,SKIN - epidermal cells,22,1,1
+PANCREAS gamma (pp) cells,21.6,27,10,PANCREAS - islets of Langerhans,40,0.002498751,0.202398801,PANCREAS - islets of Langerhans,40,0.002498751,0.202398801
+BRAIN choroid plexus cells,21.21,21,7,GALLBLADDER - glandular cells,50.5,0.173413293,1,CEREBRAL CORTEX - neuropil,32.5,0.383808096,1
+IMMUNE SYSTEM myeloid-derived suppressor cells,21,15,10,BONE MARROW - hematopoietic cells,70,0.002998501,0.221889055,BONE MARROW - hematopoietic cells,70,0.002998501,0.221889055
+LUNG alveolar macrophages,20.7,23,11,LUNG - macrophages,45,0.011994003,1,LUNG - macrophages,45,0.011994003,1
+LIVER hepatoblasts,19.55,17,10,KIDNEY - cells in tubules,57.5,1.1,1.1,LIVER - hepatocytes,32.5,1.1,1.1
+BRAIN oligodendrocyte progenitor cells,18.225,27,14,CEREBRAL CORTEX - neuropil,33.75,0.00149925,0.110944528,CEREBRAL CORTEX - neuropil,33.75,0.00149925,0.110944528
+BRAIN tanycytes,17.5,25,10,CEREBRAL CORTEX - neuronal cells,35,0.031484258,1,CEREBRAL CORTEX - neuronal cells,35,0.031484258,1
+NA taste receptor cells,17.4,20,7,DUODENUM - glandular cells,43.5,0.32133933,1,tissue not found,NA,NA,NA
+THYROID follicular cells,17.36,14,8,THYROID GLAND - glandular cells,62,0.00049975,0.036981509,THYROID GLAND - glandular cells,62,0.00049975,0.036981509
+REPRODUCTIVE germ cells,17,143,69.66666667,BRONCHUS - respiratory epithelial cells,17,0.00049975,0.03998001,OVARY - follicle cells,2.25,0.003998001,0.303848076
+LUNG clara cells,16.94,22,13,BRONCHUS - respiratory epithelial cells,38.5,0.206396802,1,LUNG - pneumocytes,34.25,0.00049975,0.036981509
+ADRENAL GLANDS chromaffin cells,16.125,25,11.33333333,ADRENAL GLAND - glandular cells,32.25,0.006496752,0.51974013,ADRENAL GLAND - glandular cells,32.25,0.006496752,0.51974013
+IMMUNE SYSTEM red pulp macrophages,16.08,12,3,LUNG - macrophages,67,0.147926037,1,BONE MARROW - hematopoietic cells,49.5,0.03998001,1
+NA glomus cells,15.96,28,12.66666667,COLON - peripheral nerve/ganglion,28.5,0.108945527,1,tissue not found,NA,NA,NA
+BRAIN satellite glial cells,15.6,24,10,CAUDATE - glial cells,32.5,0.00049975,0.03998001,CAUDATE - glial cells,32.5,0.00049975,0.03998001
+REPRODUCTIVE granulosa cells,14.96,16,8.5,PLACENTA - trophoblastic cells,46.75,0.00149925,0.116941529,OVARY - follicle cells,16.5,0.016991504,1
+GI TRACT crypt cells,14.72,16,7,SMALL INTESTINE - glandular cells,46,1.1,1.1,SMALL INTESTINE - glandular cells,46,1.1,1.1
+SMOOTH MUSCLE myofibroblasts,14.58,9,8,SMOOTH MUSCLE - smooth muscle cells,81,0.0009995,0.072963518,SMOOTH MUSCLE - smooth muscle cells,81,0.0009995,0.072963518
+REPRODUCTIVE peritubular myoid cells,14.5,25,13,SMOOTH MUSCLE - smooth muscle cells,29,0.011994003,0.887556222,OVARY - ovarian stroma cells,6,0.031484258,1
+HEART MUSCLE cardiac stem and precursor cells,14.22,18,7,HEART MUSCLE - myocytes,39.5,0.046476762,1,HEART MUSCLE - myocytes,39.5,0.046476762,1
+PLACENTA undefined placental cells,14.04,12,6,PLACENTA - trophoblastic cells,58.5,0.006496752,0.48075962,PLACENTA - trophoblastic cells,58.5,0.006496752,0.48075962
+GI TRACT enteric neurons,14,16,4,CEREBELLUM - Purkinje cells,43.75,1,1,COLON - peripheral nerve/ganglion,18.75,1,1
+VASCULATURE pericytes,13.8,10,4,ENDOMETRIUM - glandular cells,69,0.0009995,0.072963518,tissue not found,NA,NA,NA
+GI TRACT enteric glia cells,13.6,17,9.666666667,COLON - peripheral nerve/ganglion,40,1,1,COLON - peripheral nerve/ganglion,40,1,1
+IMMUNE SYSTEM nuocytes,13.5,12,4,URINARY BLADDER - urothelial cells,56.25,0.072463768,1,LYMPH NODE - non-germinal center cells,25,0.235382309,1
+URINARY BLADDER urothelial cells,12.76,11,6,URINARY BLADDER - urothelial cells,58,0.00049975,0.036981509,URINARY BLADDER - urothelial cells,58,0.00049975,0.036981509
+NA pluripotent stem cells,12.6,20,11,TONSIL - non-germinal center cells,31.5,1,1,tissue not found,NA,NA,NA
+GI TRACT gastric chief cells,12,10,5,PANCREAS - exocrine glandular cells,60,0.066466767,1,DUODENUM - glandular cells,50,1,1
+IMMUNE SYSTEM t regulatory cells,11.69,14,3,LYMPH NODE - non-germinal center cells,41.75,0.006996502,0.510744628,LYMPH NODE - non-germinal center cells,41.75,0.006996502,0.510744628
+IMMUNE SYSTEM basophils,11.6,20,6.833333333,CEREBELLUM - cells in molecular layer,29,1,1,TONSIL - squamous epithelial cells,10.5,1,1
+BRAIN dopaminergic neurons,11.55,21,6.666666667,CEREBELLUM - Purkinje cells,27.5,0.017491254,1,CEREBELLUM - Purkinje cells,27.5,0.017491254,1
+BRAIN gabaergic neurons,11.25,15,10,CEREBELLUM - Purkinje cells,37.5,0.001999,0.163918041,CEREBELLUM - Purkinje cells,37.5,0.001999,0.163918041
+BRAIN adrenergic neurons,10.72,8,3.166666667,ADRENAL GLAND - medullary cells,67,0.022988506,1,CAUDATE - neuronal projections,17,1,1
+VASCULATURE endothelial cells (blood brain barrier),10.56,16,6,SEMINAL VESICLE - glandular cells,33,1,1,CEREBRAL CORTEX - endothelial cells,21.25,1,1
+SMOOTH MUSCLE vascular smooth muscle cells,10.5,6,4,BREAST - myoepithelial cells,87.5,0.0009995,0.071964018,SMOOTH MUSCLE - smooth muscle cells,62.5,0.00049975,0.036981509
+KIDNEY kidney progenitor cells,9.625,7,4,EPIDIDYMIS - glandular cells,68.75,0.00149925,0.110944528,KIDNEY - cells in tubules,37.5,0.20089955,1
+BRAIN noradrenergic neurons,9.6,8,2.166666667,ADRENAL GLAND - glandular cells,60,0.001999,0.16191904,CAUDATE - neuronal projections,20,1,1
+SKIN trichocytes,9.6,6,4.333333333,HAIR - cells in cortex/medulla,80,0.033483258,1,SKIN - epidermal cells,5,1,1
+ORAL CAVITY salivary mucous cells,9.31,7,6,BREAST - myoepithelial cells,66.5,0.00049975,0.036981509,tissue not found,NA,NA,NA
+BRAIN glutaminergic neurons,9.3,10,6.833333333,CEREBRAL CORTEX - neuropil,46.5,0.016491754,1,CEREBRAL CORTEX - neuropil,46.5,0.016491754,1
+KIDNEY juxtaglomerular cells,9,6,3.5,SMOOTH MUSCLE - smooth muscle cells,75,0.00149925,0.112443778,KIDNEY - cells in glomeruli,6.25,0.075462269,1
+BLOOD reticulocytes,9,8,4,BONE MARROW - hematopoietic cells,56.25,1,1,BONE MARROW - hematopoietic cells,56.25,1,1
+EYE retinal progenitor cells,8.84,13,8,RECTUM - glandular cells,34,1,1,RETINA - cells in photoreceptor layer ,31,0.539230385,1
+BRAIN meningeal cells,8.1,18,10,BRONCHUS - respiratory epithelial cells,22.5,1,1,CEREBRAL CORTEX - endothelial cells,22.5,1,1
+SMOOTH MUSCLE airway smooth muscle cells,8,4,0,BREAST - myoepithelial cells,100,0.012993503,0.935532234,SMOOTH MUSCLE - smooth muscle cells,100,0.043978011,1
+BRAIN radial glia cells,7.84,14,8,CAUDATE - glial cells,28,0.00049975,0.036981509,CAUDATE - glial cells,28,0.00049975,0.036981509
+LUNG ionocytes,6.875,11,4,BRONCHUS - respiratory epithelial cells,31.25,0.07946027,1,LUNG - macrophages,0,1,1
+REPRODUCTIVE decidual cells,6.75,9,3.5,BONE MARROW - hematopoietic cells,37.5,0.043978011,1,OVARY - follicle cells,0,1,1
+HEART MUSCLE his bundle cells,6,3,0,PLACENTA - trophoblastic cells,100,1.1,1.1,HEART MUSCLE - myocytes,0,1.1,1.1
+IMMUNE SYSTEM b cells memory,5.775,5,2.833333333,LYMPH NODE - non-germinal center cells,57.75,0.005997001,0.443778111,LYMPH NODE - non-germinal center cells,57.75,0.005997001,0.443778111
+HEART MUSCLE purkinje fiber cells,5.775,5,3,CAUDATE - neuronal cells,57.75,0.099450275,1,HEART MUSCLE - myocytes,0,1,1
+LUNG airway epithelial cells,5.36,4,3,ESOPHAGUS - squamous epithelial cells,67,0.033983008,1,LUNG - pneumocytes,41.25,1,1
+BRAIN cholinergic neurons,4.69,7,3,SMALL INTESTINE - glandular cells,33.5,0.104447776,1,CEREBRAL CORTEX - neuronal cells,24.75,1,1
+BRAIN motor neurons,4.42,13,5.166666667,COLON - peripheral nerve/ganglion,17,1,1,CAUDATE - glial cells,0,1,1
+BRAIN glycinergic neurons,4,2,0,RETINA - nerve fibers in inner plexiform layer,100,0.204897551,1,CEREBRAL CORTEX - neuropil,50,0.116941529,1
+SMOOTH MUSCLE pulmonary vascular smooth muscle cells,4,2,0,SKIN - fibroblasts,100,1,1,SMOOTH MUSCLE - smooth muscle cells,0,1,1
+EMBRYO trophoblast progenitor cells,3,3,2,PLACENTA - trophoblastic cells,50,0.060969515,1,tissue not found,NA,NA,NA
+CONNECTIVE TISSUE erythroid-like and erythroid precursor cells,2,1,0,KIDNEY - cells in tubules,100,1.1,1.1,SOFT TISSUE - chondrocytes,100,1.1,1.1
+VASCULATURE oligodendrocyte progenitor cells,2,1,0,CAUDATE - glial cells,100,0.052973513,1,tissue not found,NA,NA,NA
+IMMUNE SYSTEM schwann cells,2,1,0,CAUDATE - glial cells,100,0.053973013,1,BONE MARROW - hematopoietic cells,0,1,1
+EMBRYO trophoblast stem cells,2,1,0,SKIN - keratinocytes,100,1.1,1.1,tissue not found,NA,1.1,1.1

@@ -1,0 +1,25 @@
+
+
+
+
+
+Analysis Type:	PANTHER Overrepresentation Test (Released 20200407)
+Annotation Version and Release Date:	GO Ontology database DOI:  10.5281/zenodo.3727280 Released 2020-03-23
+Analyzed List:	upload_1 (Homo sapiens)
+Reference List:	Homo sapiens (all genes in database)
+Test Type:	FISHER
+Correction:	BONFERRONI
+Bonferroni count:	9050
+GO biological process complete	Homo sapiens - REFLIST (20851)	upload_1 (49)	upload_1 (expected)	upload_1 (over/under)	upload_1 (fold Enrichment)	upload_1 (P-value)
+induction of bacterial agglutination (GO:0043152)	6	3	.01	+	 > 100	9.12E-03
+plasminogen activation (GO:0031639)	11	3	.03	+	 > 100	3.92E-02
+respiratory gaseous exchange by respiratory system (GO:0007585)	48	5	.11	+	44.33	1.37E-03
+negative regulation of response to wounding (GO:1903035)	93	6	.22	+	27.45	1.04E-03
+negative regulation of wound healing (GO:0061045)	78	5	.18	+	27.28	1.32E-02
+toll-like receptor signaling pathway (GO:0002224)	99	5	.23	+	21.49	4.02E-02
+regulation of response to wounding (GO:1903034)	183	6	.43	+	13.95	4.63E-02
+organic acid transport (GO:0015849)	289	8	.68	+	11.78	3.73E-03
+carboxylic acid transport (GO:0046942)	289	8	.68	+	11.78	3.73E-03
+positive regulation of protein secretion (GO:0050714)	285	7	.67	+	10.45	4.55E-02
+regulation of localization (GO:0032879)	2838	21	6.67	+	3.15	4.96E-03
+multicellular organismal process (GO:0032501)	7037	36	16.54	+	2.18	1.62E-04
