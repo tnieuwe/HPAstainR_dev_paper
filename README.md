@@ -52,7 +52,7 @@ Cancer Tissue: https://www.proteinatlas.org/download/pathology.tsv.zip
 
 ## Acknowledgments
 
-* Thank you Stephanie Yang for helpful comments - [syang93](https://github.com/syyang93/)
+* Thank you Stephanie Yang and Veronica Busa for helpful comments - [syang93](https://github.com/syyang93/) & [vbusa1](https://github.com/vbusa1)
 * Thank you Matt McCall and Zach Brehm for reviewing the code - [mccallm](https://github.com/mccallm) & [zachbrehm](https://github.com/zachbrehm)
 * Human Protein Atlas for data availability and data structure
 * PurpleBooth for the README template - [PurpleBooth](https://gist.github.com/PurpleBooth/)
