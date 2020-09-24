@@ -1,0 +1,889 @@
+---
+title: "HPAStainR vs Single Cell Data"
+author: "Tim Nieuwenhuis"
+date: "8/12/2020"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+## Install HPAStainR and load other packages and functions
+
+```{r results="hide", message=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+# The following initializes usage of Bioc devel
+BiocManager::install(version='devel')
+
+BiocManager::install("HPAStainR")
+
+library(tidyverse)
+library(HPAStainR)
+library(R.utils)
+library(ggpubr)
+getURL <- function(URL, FUN, ..., N.TRIES = 1L) {
+        N.TRIES <- as.integer(N.TRIES)
+        stopifnot(length(N.TRIES) == 1L, !is.na(N.TRIES))
+        
+        while (N.TRIES > 0L) {
+            result <- tryCatch(FUN(URL, ...), error = identity)
+            if (!inherits(result, "error")) 
+                break
+            N.TRIES <- N.TRIES - 1L
+        }
+        
+        if (N.TRIES == 0L) {
+            stop("'getURL()' failed:", "\n  URL: ", URL, "\n  error: ", 
+                conditionMessage(result))
+        }
+        
+        result
+    }
+```
+
+
+
+## Load HPA data
+
+Using HPAStainR's built in functions
+```{r}
+
+#hpa_dat <- read.table("../normal_tissue.tsv", sep = '\t', header = TRUE, stringsAsFactors = F)
+hpa_dat <- HPAStainR::HPA_data_downloader("normal",save_file = F)
+cancer_dat <- HPAStainR::HPA_data_downloader("cancer",save_file = F)
+```
+
+
+
+
+### Read in PanglaoDB
+
+ + Download the PanglaoDB marker data from their website
+ + Filter to protein coding genes and human relevant data
+
+```{r read in pangloa data}
+
+
+temp <- tempfile()
+getURL(URL = "https://panglaodb.se/markers/PanglaoDB_markers_27_Mar_2020.tsv.gz", 
+    FUN = download.file, destfile = temp)
+dat <- read.table(gunzip(temp, "PanglaoDB_markers_27_Mar_2020.tsv.gz", overwrite = T), sep = "\t",
+                  header = TRUE, stringsAsFactors = FALSE)
+unlink(temp)
+
+
+# download.file("https://panglaodb.se/markers/PanglaoDB_markers_27_Mar_2020.tsv.gz",
+#               "PanglaoDB_markers_27_Mar_2020.tsv.gz")
+# dat <- read.table(gunzip("PanglaoDB_markers_27_Mar_2020.tsv.gz", overwrite = T), sep = "\t",
+#                   header = TRUE, stringsAsFactors = FALSE)
+
+
+#dat <- read.table("PanglaoDB_markers_27_Mar_2020.tsv", sep = "\t", header = T, stringsAsFactors = F)
+
+#See data organization
+knitr::kable(head(tibble(dat)))
+
+#Remove mouse data, product description, and nickname column
+dat <- dat %>% select(-ends_with("mouse"), -nicknames, -product.description) %>%
+  #protein coding only and mouse exclusive
+  filter(species != "Mm",gene.type == "protein-coding gene" | gene.type == "protein coding gene") %>%
+  #Make data more easily jive with hpastainr such as lungs vs lung
+  mutate(organ = ifelse(organ == "Lungs", "Lung", organ),
+         organ = ifelse(organ == "Heart", "Heart Muscle", organ)) %>%
+  #make comprable column to hpastainr
+  mutate(stainr_col = paste0(toupper(organ), " ", tolower(cell.type)))
+
+
+
+```
+
+## The for loop that runs PanglaoDB through HPAStainR
+
+Below is the main experiment which is a for loop which does the following
+
+ + Selects a cell type from PanglaoDB
+ + Runs the cell type's gene list through HPAStainR's main function only using normal tissue
+ + Take top results from the output and save them
+ + Then find and save the top result for the specific organ of interest (the organ where the cell type comes from). When an exact match fails to exist a pathologist selected the closest possible tissue.
+ + Generate the confidence score
+ + Write out results to a csv file 
+ 
+```{r }
+
+#Get a list of panglao cell types
+groupings <- unique(dat$stainr_col)
+
+#This is used if trouble shooting
+#cell_type <- groupings[1]
+
+#Initiate df that will be added to via the loop
+final_df <- NULL
+#Use this to catch dropped cell types without staining
+no_stain <- NULL
+
+#For loop through panglao cell types to run them through HPAStainR
+for (cell_type in groupings) {
+  
+  #Subset out data to just cell type of interest
+  sub_dat <- dat %>% filter(stainr_col == cell_type)
+  #Pull out the list of genes
+  genes <- sub_dat$official.gene.symbol
+  #Run HPAStainR
+  stain_result <- HPAStainR(gene_list = genes,hpa_dat = hpa_dat, cancer_analysis = "normal", csv_names = T)
+  
+  stain_result
+  
+  if (is.na(stain_result[1,2])) {
+    no_stain <- c(no_stain, cell_type)
+    next
+  }
+  
+  #Make a filter to get top stainr result from a tissue
+  stain_result  <- stain_result %>%
+    mutate(tissue = str_sub(cell_type, start = 1, end = (str_locate(cell_type,"-"))[,1]  -2),
+           stained_count = str_count(detected_proteins,",") + 1)
+  
+  #Top results of HPAStainR
+  top_result <- stain_result$cell_type[1]
+  top_stain <- stain_result$staining_score[1]
+  top_pval <- stain_result$p_val[1]
+  top_adj_pval <- stain_result$p_val_adj[1]
+
+  ##Below code is used to match tissue types from panglao and HPA and then pull
+  #the topped matched hit
+  
+  #normal
+  sub_stain <- stain_result %>% filter(tissue == toupper(unique(sub_dat$organ)))
+  
+  
+  if (is.na(unique(sub_dat$organ))) {
+    sub_dat$organ <- ""
+  }
+  
+  #GI tract
+  if ("GI TRACT" == toupper(unique(sub_dat$organ))) {
+    
+    sub_stain <- stain_result %>% filter(tissue %in% c("COLON", "DUODENUM", "RECTUM", "SMALL INTESTINE"))
+  }
+  
+  #Blood brain barrier
+  if ("BRAIN" == toupper(unique(sub_dat$organ)) |
+      "endothelial cells (blood brain barrier)" == tolower(unique(sub_dat$cell.type))) {
+    #Brain
+    sub_stain <- stain_result %>% filter(tissue %in% c("CAUDATE",
+                                                       "CEREBELLUM",
+                                                       "CEREBRAL CORTEX",
+                                                       "CHOROID PLEXUS",
+                                                       "DORSAL RAPHE",
+                                                       "HIPPOCAMPUS",
+                                                       "HYPOTHALAMUS",
+                                                       "PITUITARY GLAND",
+                                                       "SUBSTANTIA NIGRA"))
+    }
+  #Eye
+      if ("EYE" == toupper(unique(sub_dat$organ))) {
+    
+    sub_stain <- stain_result %>% filter(tissue %in% c("RETINA"))
+      }
+  #Breast
+   if ("MAMMARY GLAND" == toupper(unique(sub_dat$organ))) {
+    
+    sub_stain <- stain_result %>% filter(tissue %in% c("BREAST",
+                                                       "LACTATING BREAST"))
+    }
+  
+    #reproductive
+   if ("REPRODUCTIVE" == toupper(unique(sub_dat$organ))) {
+    
+    sub_stain <- stain_result %>% filter(tissue %in% c("TESTIS",
+                                                       "OVARY"))
+   }
+      #adrenal
+   if ("ADRENAL GLANDS" == toupper(unique(sub_dat$organ))) {
+    
+    sub_stain <- stain_result %>% filter(tissue %in% c("ADRENAL GLAND"))
+   }
+  
+        #throid
+   if ("THYROID" == toupper(unique(sub_dat$organ))) {
+    
+    sub_stain <- stain_result %>% filter(tissue %in% c("THYROID GLAND"))
+   }
+  
+          #ENDOTHELIAL
+   if ("endothelial cells (aorta)" == tolower(unique(sub_dat$cell.type))) {
+    
+    sub_stain <- stain_result %>% filter(tissue %in% c("COLON"))
+    }
+  
+  
+        #bone and blood
+   if ("BONE" == toupper(unique(sub_dat$organ)) | "BLOOD" == toupper(unique(sub_dat$organ))) {
+    
+    sub_stain <- stain_result %>% filter(tissue %in% c("BONE MARROW"))
+   }
+  
+     if ("OLFACTORY SYSTEM" == toupper(unique(sub_dat$organ))) {
+    
+    sub_stain <- stain_result %>% filter(tissue %in% c("NASOPHARYNX"))
+     }
+  
+       if ("IMMUNE SYSTEM" == toupper(unique(sub_dat$organ))) {
+    
+    sub_stain <- stain_result %>% filter(tissue %in% c("BONE MARROW",
+                                                       "THYMUS",
+                                                       "LYMPH NODE",
+                                                       "TONSIL"))
+    }
+  
+  
+   if ("CONNECTIVE TISSUE" == toupper(unique(sub_dat$organ))) {
+    #Brain
+    sub_stain <- stain_result %>% filter(tissue %in% c("ADIPOSE TISSUE",
+                                                       "SOFT TISSUE"))
+    }
+  
+  #Stores the top result from the correct tissue in an object
+  top_tiss_result <- sub_stain$cell_type[1]
+  top_tiss_stain <- sub_stain$staining_score[1]
+  top_tiss_pval <- sub_stain$p_val[1]
+  top_tiss_adj_pval <- sub_stain$p_val_adj[1]
+  
+  #Catches no found tissues
+  if (nrow(sub_stain) == 0) {
+    top_tiss_result <- "tissue not found"
+  }
+  
+  #Number of proteins used
+  proteins_used <- length(unique(sub_dat$official.gene.symbol))
+  
+  #The average N of proteins used for the top ten results (not all tissues are tested equally)
+  top_10_avg_prot_tested <- mean(head(stain_result$number_of_proteins))
+  
+  #Make confidence score to account for low protein count not being taken into account
+  
+  conf_score <- ifelse(proteins_used > 50, 50, proteins_used) * 0.02 * top_stain
+  
+  #If there is not enough data to run a chi_square turn results into NA
+  if (is.null(top_adj_pval)) {
+    top_adj_pval =NA 
+    top_tiss_adj_pval =NA
+     top_pval =NA 
+    top_tiss_pval =NA
+  }
+  
+  #Make single row output dataframe to be bound to main dataframe
+  temp_dat <- data.frame(cell_type,
+                         conf_score,
+                         proteins_used,
+                         top_10_avg_prot_tested,
+                         top_result, top_stain,
+                         top_pval,
+                         top_adj_pval,
+                         top_tiss_result,
+                         top_tiss_stain,
+                         top_tiss_pval,
+                         top_tiss_adj_pval,
+                         stringsAsFactors = F)
+  
+  #Bind it
+  final_df <- rbind(final_df, temp_dat)
+}
+
+knitr::kable(head(final_df))
+#write.csv(final_df, "data_out/extended_table_4_final_df_output.csv", row.names = F)
+```
+
+## PanglaoDB Data summary
+### Includes unused csv and extended figure 1
+```{r}
+
+#Comparing available cell types between Panglao and HPA
+avail_hpa_tissue_cells = unique(stain_result$cell_type)
+avail_pangloa_tissue_cells = unique(dat$stainr_col)
+
+avail_hpa_tissue_cells <- c(avail_hpa_tissue_cells,
+                            rep("", length(avail_pangloa_tissue_cells) - length(avail_hpa_tissue_cells)))
+
+tissues_and_cells <- cbind(avail_hpa_tissue_cells, avail_pangloa_tissue_cells)
+
+colnames(tissues_and_cells) <- c("Tissue - Cells in HPA", " Tissue - Cells in PanglaoDB")
+
+#write.csv(tissues_and_cells, "panglao_v_hpa_available_cell_types.csv", row.names = F)
+
+
+#Make a histogram of how many marker genes there are per cell type
+summ_dat <- dat %>% group_by(cell.type) %>% summarize(genes = n())
+
+
+summary(summ_dat)
+ticks <- c(1, 50, 100, 150, 200)
+ext_fig_4 <- ggplot(summ_dat, aes(x=genes)) + 
+                geom_histogram(color="black", fill="white", bins = 30) +
+                xlab("Marker Genes Per Cell Type") + 
+                labs(title ="PanglaoDB Markers per Cell Type",
+                     subtitle =  paste("N = ", nrow(summ_dat),"; bins = 30")) +
+                ylab("Count of Cell Types") +
+                theme_classic() + scale_x_continuous(breaks=ticks)
+
+ext_fig_4
+  
+ggsave("data_out/extended_figure_3_pangloa_hist.png", width = 8, height = 7)
+ggsave("data_out/extended_figure_5_pangloa_hist.eps", width = 8, height = 7)
+
+```
+
+extended Table 2-3 
+```{r message=FALSE}
+ ## Make new column combining cell type and tissue
+    hpa_dat_2 <- hpa_dat %>%
+        mutate(Tissue = gsub("[[:digit:]]+", "", Tissue),
+               tissue_cell = paste0(toupper(str_trim(Tissue)),
+                                    " - ",
+                                    Cell.type))
+
+
+low_filter_supp_2   <- hpa_dat_2 %>%
+    select(Gene.name, tissue_cell, Reliability, Level) %>%
+    mutate(stained = ifelse(Level %in% c("Not detected", "N/A"), 0, 1)) %>%
+    unique() %>%
+    group_by(Gene.name) %>% summarise(n(), stain_count = sum(stained)) %>%
+    mutate(stained_per_test = stain_count/ `n()`, filter = "low" ) %>%
+    rename(`Times tested` = `n()`,
+           `Time stained` = stain_count,
+           `Stained per tested Low` = stained_per_test) %>%
+  filter(`Stained per tested Low` != 0)
+
+low_filter_supp_2 <- low_filter_supp_2 %>%
+  mutate(`Rare Low` = ifelse(`Stained per tested Low` <
+                         quantile(low_filter_supp_2$`Stained per tested Low`, .25),
+                       "yes", "no")) %>%
+  select(Gene.name, `Stained per tested Low`, `Rare Low` )
+
+
+
+normal_filter_supp_2   <- hpa_dat_2 %>%
+    select(Gene.name, tissue_cell, Reliability, Level) %>%
+    filter(Reliability %in% c("Enhanced", "Supported", "Approved")) %>%
+    mutate(stained = ifelse(Level %in% c("Not detected", "N/A"), 0, 1)) %>%
+      unique() %>%
+    group_by(Gene.name) %>% summarise(n(), stain_count = sum(stained)) %>%
+    mutate(stained_per_test = stain_count/ `n()`, filter = "normal" ) %>%
+    rename(`Times tested` = `n()`,
+           `Time stained` = stain_count,
+           `Stained per tested Normal` = stained_per_test)
+
+normal_filter_supp_2 <- normal_filter_supp_2 %>%
+  mutate(`Rare Normal` = ifelse(`Stained per tested Normal` <
+                         quantile(normal_filter_supp_2$`Stained per tested Normal`, .25),
+                       "yes", "no")) %>%
+  select(Gene.name, `Stained per tested Normal`, `Rare Normal` )
+
+
+high_filter_supp_2   <- hpa_dat_2 %>%
+    select(Gene.name, tissue_cell, Reliability, Level) %>%
+    filter(Reliability %in% c("Enhanced","Supported")) %>%
+    mutate(stained = ifelse(Level %in% c("Not detected", "N/A"), 0, 1)) %>%
+    unique() %>%
+    group_by(Gene.name) %>% summarise(n(), stain_count = sum(stained)) %>%
+    mutate(stained_per_test = stain_count/ `n()`, filter = "high" ) %>%
+    rename(`Times tested` = `n()`,
+           `Time stained` = stain_count,
+           `Stained per tested High` = stained_per_test)
+
+high_filter_supp_2 <- high_filter_supp_2 %>%
+  mutate(`Rare High` = ifelse(`Stained per tested High` <
+                         quantile(high_filter_supp_2$`Stained per tested High`, .25),
+                       "yes", "no")) %>%
+  select(Gene.name, `Stained per tested High`, `Rare High` )
+
+
+supp_table_2 <- left_join(left_join(low_filter_supp_2, normal_filter_supp_2), high_filter_supp_2) %>%
+  mutate_if(is.numeric, round, 3)
+
+
+#write.csv(supp_table_2, "data_out/extended_table_2_gene_rarity.csv", row.names = FALSE)
+####Repeat for cancer
+ 
+cancer_sub_table <- cancer_dat %>%
+  select(Gene.name, Cancer, High, Medium, Low, Not.detected) %>%
+  mutate(stained = High + Medium + Low, tested = stained + Not.detected) %>%
+  group_by(Gene.name) %>%
+  summarise(stained = sum(stained,na.rm = T),
+              tested = sum(tested,na.rm = T)) %>%
+  mutate(`Stained per Tested` = round(stained/tested, 3)) %>%
+  filter(!is.nan(`Stained per Tested`)) 
+  
+cancer_sub_table <- cancer_sub_table %>%
+  mutate(Rare = ifelse(`Stained per Tested` <
+                         quantile(cancer_sub_table$`Stained per Tested`, .25),
+                       "Yes", "No"))
+#write.csv(cancer_sub_table, "extended_table_3_cancer_gene_rarity.csv", row.names = FALSE)
+quantile(supp_table_2$`Stained per tested Low`, .25)
+quantile(supp_table_2$`Stained per tested Normal`, .25, na.rm = T)  
+quantile(supp_table_2$`Stained per tested High`, .25, na.rm = T)  
+  
+
+rarity_table  <- rbind(table(supp_table_2$`Rare Low`),
+table(supp_table_2$`Rare Normal`),
+table(supp_table_2$`Rare High`),
+table(cancer_sub_table$Rare))
+
+rownames(rarity_table) <- c("Low Filter", "Normal Filter", "High Filter", "Cancer")
+
+title <- paste0(
+"Number of Rare Proteins per Filtration Level"
+) %>%
+  strwrap(width = 25) %>%
+  paste(collapse = "\n")
+
+
+ggtexttable(rarity_table) %>%
+  tab_add_title(text = title, face = "bold", padding = unit(0.1, "line"))
+  
+```
+
+This is a visualization of the data generated from the tables above to get a sense of the rarity of different proteins and their distribution of staining frequency. These are extended Figures 3B and 4B.
+
+```{r message=FALSE}
+library(reshape2)
+
+normal_gene_df <- supp_table_2 %>% select(Gene.name,
+                        Low = `Stained per tested Low`,
+                        Normal = `Stained per tested Normal`,
+                        High = `Stained per tested High`)
+
+
+normal_gene_df_melt <- melt(normal_gene_df)
+
+
+ext_fig_2b <- ggplot(normal_gene_df_melt, aes(x = value, fill = variable)) +
+  geom_histogram(position="dodge", alpha=0.5, color = "black", bins=30) +
+  geom_vline(xintercept = c(quantile(normal_gene_df$Low, .25, na.rm = TRUE),
+                            quantile(normal_gene_df$Normal, .25, na.rm = TRUE),
+                            quantile(normal_gene_df$High, .25, na.rm = TRUE)),
+             color = c("red", "green", "blue"),
+             linetype ="dashed",
+             size = 1) +
+            scale_x_continuous(labels = scales::percent) +
+  labs(title = "HPA Ratio of Protein Staining to Protein Histological Scoring",
+       subtitle = paste("Lines represent 1st quartile for each distribution","; bins = 30")) +
+  xlab("Percent of Cells that a Protein has Stained in") +
+  ylab("Count of Proteins") +
+  scale_fill_discrete(name="Scoring Quality Stringency") +
+  theme_classic() +
+  theme(legend.position = "top")
+
+ext_fig_2b
+ggsave("data_out/extended_fig_2b.png")
+
+## For cancer below
+
+ext_fig_3b <- ggplot(cancer_sub_table, aes(x = `Stained per Tested`)) +
+  geom_histogram(fill = "white", color = "black") +
+  geom_vline(xintercept = quantile(cancer_sub_table$`Stained per Tested`,
+                                   .25, na.rm = TRUE)) +
+            scale_x_continuous(labels = scales::percent) +
+  labs(title = "HPA Cancer Ratio of Protein Staining to Protein Histological Scoring",
+       subtitle = paste("Line represents 1st quartile the distribution","; bins = 30")) +
+  xlab("Percent of Cancers that a Protein has Stained in") +
+  ylab("Count of Proteins") +
+  theme_classic()
+ext_fig_3b
+ggsave("data_out/extended_fig_3b.png")
+
+```
+
+Here we generate a boxplot for normal data and cancer data showing the distribution of how many cell types proteins were evaluated in, based on where they are in the above bins made by the histogram. These are Extended Figure 2 and 3 A.
+
+```{r message=FALSE}
+normal_melt <- normal_gene_df_melt %>% filter(variable == "Normal") %>% arrange(desc(value)) %>% drop_na()
+normal_melt$bins <- cut(normal_melt$value, breaks = 30)
+
+#normal_melt$bins <- factor(normal_melt$bins, levels = rev(levels(normal_melt$bins)))
+
+normal_prot_test   <- hpa_dat_2 %>%
+    select(Gene.name, tissue_cell, Reliability, Level) %>%
+    unique() %>%
+    filter(Reliability %in% c("Enhanced", "Supported", "Approved")) %>%
+    mutate(stained = ifelse(Level %in% c("Not detected", "N/A"), 0, 1)) %>%
+    group_by(Gene.name) %>% summarise(n(), stain_count = sum(stained)) %>%
+    rename(`Times tested` = `n()`,
+           `Time stained` = stain_count)
+
+
+normal_bins <- left_join(normal_prot_test, normal_melt) %>% drop_na()
+
+
+#Rename bins
+
+
+ext_fig_2a <- ggplot(normal_bins, aes(bins, `Times tested`)) +
+  geom_boxplot() +
+ scale_x_discrete(labels = as.character(1:30)) +
+  ylab("N of cell types proteins have been evaluated in") +
+  theme_classic()
+  
+ext_fig_2a
+ggsave("data_out/extended_fig_2a.png")
+
+#### With cancer
+
+cancer_melt <- cancer_sub_table %>%
+  arrange(desc(`Stained per Tested`)) %>%
+  drop_na()
+cancer_melt$bins <- cut(cancer_melt$`Stained per Tested`, breaks = 30)
+
+ext_fig_3a <- ggplot(cancer_melt, aes(bins, tested)) +
+  geom_boxplot() +
+ scale_x_discrete(labels = as.character(1:30)) +
+  #coord_flip() +
+  ylab("N of cancers proteins have been evaluated in") +
+  theme_classic()
+
+ext_fig_3a
+ggsave("data_out/extended_fig_3a.png")
+
+```
+
+
+
+## HPA Data Summary
+### Includes Extended Figure 1 A-C, Extended Figure 3 and extended Table 4
+
+
+Preparing the data
+```{r message=FALSE}
+
+
+#Generate data to gain an understanding of the amount of proteins tested to the amount of proteins stained
+
+#Clean the hpa data
+hpa_dat_new <- hpa_dat %>% 
+      mutate(Tissue = gsub('[[:digit:]]+', '', Tissue),
+             tissue_cell = paste0(toupper(str_trim(Tissue))," - ", Cell.type)) %>%
+      distinct()
+
+
+
+#Generate a summary of hpa_summary
+hpa_dat_sum <- hpa_dat_new %>% group_by(tissue_cell) %>%
+  summarise(proteins = n(), detected = sum(!(Level %in% "Not detected")) ) %>%
+  mutate(det_o_test = detected/proteins,
+         amount_tested = ifelse(proteins <= 50, "\u2264 50", 
+                          ifelse(proteins > 50 & proteins <= 700, "51 \u2264 & \u2264 700",
+                          ifelse(proteins > 700 & proteins <= 15000, "701 \u2264 & \u2264 15,000",
+                                   "15,000 \u2264")))) %>%
+    filter(tissue_cell != "N/A - N/A")
+
+
+hpa_dat_sum$amount_tested <- factor(hpa_dat_sum$amount_tested,
+                                    levels = c("\u2264 50",
+                                               "51 \u2264 & \u2264 700",
+                                               "701 \u2264 & \u2264 15,000",
+                                               "15,000 \u2264"))
+
+stat_mode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+stat_mode(hpa_dat_sum$proteins)
+summary(hpa_dat_sum$proteins)
+```
+
+
+Extended Figure 1A
+```{r}
+ticks <- c(1, 5000, 10000, 15000)
+
+
+ext_fig_1a <- ggplot(hpa_dat_sum, aes(x=(proteins), fill = amount_tested)) + 
+              geom_histogram(color="black", bins=100) +
+              xlab("Scored Proteins Per Cell Type") +
+              labs( title ="HPA Count of Histologically Scored Proteins per Cell Type",
+                    subtitle = paste("N = ", nrow(hpa_dat_sum),"; 100 bins")) +
+              geom_vline(xintercept= c(700, 15000),
+                         linetype = c("longdash"),
+                         color = c("red", "dark green"),
+                         size = 1.2) +
+              geom_segment(aes(x = c(5000),
+                               xend = c(10000),
+                               y = c(30),
+                               yend = c(30)),
+                           color = "red",
+                           linetype = c("longdash"), size = 1.2) +
+              geom_segment(aes(x = c(5000),
+                               xend = c(10000),
+                               y = c(40),
+                               yend = c(40)),
+                           color = "dark green",
+                           linetype = c("longdash"),
+                           size = 1.2) +
+              annotate(geom="text", #angle = 90, vjust = 1.3,
+                       size = 5,  
+                       x=c(7500, 7500), 
+                       y=c(35, 45), 
+                       label=c("700 Protein Line", "15,000 Protein Line")
+                          #color="red"
+                      
+                       ) +
+              scale_fill_discrete(name="Number of Proteins Scored") +
+              ylab("Count of Cell Types") + theme_classic() +
+              scale_x_continuous(breaks=ticks)
+                    
+
+ext_fig_1a
+
+ggsave("data_out/extended_figure_1a_proteins_tested.png", width = 9, height = 6)
+
+```
+
+
+```{r}
+
+ticks <- c(1, 4000, 8000, 12000)
+ext_fig_1b <- ggplot(hpa_dat_sum, aes(x=detected)) + 
+              geom_histogram(aes(fill = amount_tested),color="black", bins=50) +
+              xlab("Count of Positively Staining Proteins Per Cell Type") +
+              labs(title="HPA Detected Proteins",
+              subtitle = paste("N = ", nrow(hpa_dat_sum), "; bins = 50")) +
+              ylab("Count of Cell Types") + 
+              scale_fill_discrete(name="Number of Proteins Histologically Score")+ theme_classic() +
+              scale_x_continuous(breaks=ticks)
+
+ext_fig_1b
+
+ggsave("data_out/extended_figure_1b_proteins_detected.png", width = 9, height = 6)
+```
+
+
+```{r }
+
+ext_fig_1c <- ggplot(hpa_dat_sum, aes(x=det_o_test)) + 
+              geom_histogram(aes(fill =amount_tested), color="black", bins = 30) +
+              xlab("Percent of Detected to Evaluated Proteins per Cell Type") +
+              labs(title="HPA Detected/Histologically Scored Proteins",
+                   subtitle = paste("N = ", nrow(hpa_dat_sum),"; bins = 30")) +
+              ylab("Count of Cell Types") + 
+              scale_fill_discrete(name="Number of Proteins Scored") +
+              theme_classic() +
+              scale_x_continuous(labels = scales::percent)
+
+ext_fig_1c
+
+ggsave("data_out/extended_figure_1c_proteins_detected_divby_tested.png", width = 9, height = 6)
+```
+
+Extended Table 1
+```{r}
+
+hpa_dat_sum_out <- select(hpa_dat_sum,
+                          `Cell Type` = tissue_cell,
+                          `Tested Proteins` = proteins,
+                          `Detected Proteins` = detected,
+                          `Detected Tested Ratio` = det_o_test)
+
+#write.csv(hpa_dat_sum_out, "data_out/extended_table_1_hpa_cell_type_tested_ratio.csv",row.names = F)
+```
+
+Writing out all of the plots
+```{r}
+
+cairo_pdf(filename = "extended_Figures.pdf", width = 8, height = 5, onefile=T)
+ext_fig_1a
+ext_fig_1b
+ext_fig_1c
+ext_fig_2a
+ext_fig_2b
+ext_fig_3a
+ext_fig_3b
+ext_fig_4
+dev.off()
+
+ticks <- c(1, 4000, 8000, 12000)
+
+
+```
+
+# Recapitulate McCall experiment.
+
+The chunk below does the following:
+ + Reads in the McCall et al. gene clusters from the GTEx lung
+ + Runs gene cluster A and gene cluster B through HPAStainR
+ + Prints and saves results of each analysis
+
+
+```{r}
+
+file_path <- "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5011060/bin/mmc3.xls"
+
+temp = tempfile(fileext = ".xlsx")
+download.file(file_path, destfile=temp, mode='wb')
+
+lung_clust <- readxl::read_xls(temp)
+
+supp_table_4 <- HPAStainR(lung_clust$`Cluster A`, hpa_dat = hpa_dat, cancer_dat = cancer_dat)
+supp_table_5 <- HPAStainR(lung_clust$`Cluster B`, hpa_dat = hpa_dat, cancer_dat = cancer_dat)
+
+
+supp_table_4
+supp_table_5
+
+#write.csv(supp_table_4, "data_out/extended_table_4_pneumocytes.csv",row.names = F)
+#write.csv(supp_table_5, "data_out/extended_table_5_bronchus.csv", row.names = F)
+```
+
+The purpose of this is to show that we can recapitulate the results from the
+McCall paper which shows that these two cluster, A and B, are associated with
+pneumocytes (due to surfactants) and bronchus epithelial cells respectively. 
+As you can see HPAStainR correctly characterizes these cell types.
+
+
+Further clean up data by writing out to single XLSX file
+
+This ended up not working so I'll just do them as a CSV
+```{r}
+
+#Ext table 1
+write.csv(hpa_dat_sum_out,
+           file = "data_out/exteneded_table_1.csv",
+            row.names = F)
+#Ext table 2
+write.csv(supp_table_2,
+           file = "data_out/exteneded_table_2.csv",
+           row.names = F)
+#Ext table 3
+write.csv(cancer_sub_table,
+           file = "data_out/exteneded_table_3.csv",
+          row.names = F)
+#Ext table 4
+write.csv(final_df,
+           file = "data_out/exteneded_table_4.csv",
+           row.names = F)
+#Ext table 5
+write.csv(supp_table_4,
+           file = "data_out/exteneded_table_5.csv",
+           row.names = F)
+
+#Ext table 6
+write.csv(supp_table_5,
+           file = "data_out/exteneded_table_6.csv", row.names = F)
+
+
+# #Ext table 1
+# write.xlsx(hpa_dat_sum_out,
+#            file = "data_out/exteneded_tables.xlsx",
+#            sheetName = "Extended Table 1")
+# #Ext table 2
+# write.xlsx(supp_table_2,
+#            file = "data_out/exteneded_tables.xlsx",
+#            sheetName = "Extended Table 2", append=TRUE)
+# #Ext table 3
+# write.xlsx(cancer_sub_table,
+#            file = "data_out/exteneded_tables.xlsx",
+#            sheetName = "Extended Table 3", append=TRUE)
+# #Ext table 4
+# write.xlsx(final_df,
+#            file = "data_out/exteneded_tables.xlsx",
+#            sheetName = "Extended Table 4", append=TRUE)
+# #Ext table 5
+# write.xlsx(supp_table_4,
+#            file = "data_out/exteneded_tables.xlsx",
+#            sheetName = "Extended Table 5", append=TRUE)
+# 
+# #Ext table 6
+# write.xlsx(supp_table_5,
+#            file = "data_out/exteneded_tables.xlsx",
+#            sheetName = "Extended Table 6", append=TRUE)
+
+
+# write.xlsx(tissues_and_cells)
+# write.xlsx(supp_table_2)
+# write.xlsx(cancer_sub_table)
+# write.xlsx(supp_table_4)
+# write.xlsx(supp_table_5)
+```
+
+
+
+No longer used code below
+```{r}
+
+# marc_check <- hpa_dat_2 %>% select(Gene.name, tissue_cell, Reliability, Level) %>%
+#   unique() %>%
+#   group_by(Gene.name) %>% summarise(count = n())
+# 
+# hist(marc_check$count)
+# 
+# summary(marc_check$count)
+# 
+# 
+# #Redo with low
+# 
+# low_melt <- normal_gene_df_melt %>% filter(variable == "Low") %>% arrange(desc(value)) %>% drop_na()
+# low_melt$bins <- cut(low_melt$value, breaks = 30)
+# 
+# low_melt$bins <- factor(low_melt$bins, levels = rev(levels(low_melt$bins)))
+# 
+# 
+# low_prot_test   <- hpa_dat_2 %>%
+#     select(Gene.name, tissue_cell, Reliability, Level) %>%
+#     unique() %>%
+#     #filter(Reliability %in% c("Enhanced", "Supported", "Approved")) %>%
+#     mutate(stained = ifelse(Level %in% c("Not detected", "N/A"), 0, 1)) %>%
+#     group_by(Gene.name) %>% summarise(n(), stain_count = sum(stained)) %>%
+#     rename(`Times tested` = `n()`,
+#            `Time stained` = stain_count)
+# 
+# 
+# low_bins <- left_join(low_prot_test, low_melt) 
+
+# 
+# 
+# 
+# #Rename bins
+# 
+# 
+# ggplot(low_bins, aes(bins, `Times tested`)) +
+#   geom_boxplot() +
+#  scale_x_discrete(labels = as.character(1:30)) +
+#   ylab("N of cell types proteins have been evaluated in") +
+#   theme_classic()
+# 
+# arrange(low_bins, (`Times tested`))
+# 
+# SCO2_look   <- hpa_dat_2 %>%
+#     select(Gene.name, tissue_cell, Reliability, Level) %>%
+#     unique() %>% filter(Gene.name == "SCO2")
+
+```
+
+Sanity plot
+```{r height = 10}
+
+
+low_plot <- ggplot(low_filter_supp_2, aes(`Stained per tested Low`, fill = `Rare Low`)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = quantile(low_filter_supp_2$`Stained per tested Low`, .25))
+
+high_plot <- ggplot(high_filter_supp_2, aes(`Stained per tested High`, fill = `Rare High`)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = quantile(high_filter_supp_2$`Stained per tested High`, .25))
+
+normal_plot <- ggplot(normal_filter_supp_2, aes(`Stained per tested Normal`, fill = `Rare Normal`)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = quantile(normal_filter_supp_2$`Stained per tested Normal`, .25))
+
+
+
+
+ggarrange(low_plot, normal_plot, high_plot, nrow = 3)
+
+```
+
