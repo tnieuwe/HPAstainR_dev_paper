@@ -73,3 +73,6 @@ Cancer Tissue: https://www.proteinatlas.org/download/pathology.tsv.zip
 * Human Protein Atlas for data availability and data structure
 * PurpleBooth for the README template - [PurpleBooth](https://gist.github.com/PurpleBooth/)
 * The people at Bioconductor for reviewing my tool
+
+# License
+Artistic-2.0
