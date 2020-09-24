@@ -74,5 +74,6 @@ Cancer Tissue: https://www.proteinatlas.org/download/pathology.tsv.zip
 * PurpleBooth for the README template - [PurpleBooth](https://gist.github.com/PurpleBooth/)
 * The people at Bioconductor for reviewing my tool
 
-# License
+# License and DOI
 Artistic-2.0
+https://zenodo.org/badge/246627856.svg
