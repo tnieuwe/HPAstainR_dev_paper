@@ -1,8 +1,8 @@
 # HPAStain.R
 
-HPAStain.R is an [R package](https://github.com/tnieuwe/HPAStainR)/[Shiny app](https://32tim32.shinyapps.io/HPAStainR/) used to query the Human Protein Atlas for staining data. The purpose of this tool is to test if a list of proteins/genes is associated with a certain cell type in a HPA tested tissue. E.g. you have a list of protein coding genes from a differential expression single cell analysis and want to see if these proteins are associated with a known cell type. Instead of querying HPA multiple times you can load your list in HPAStainR which will return a ranked table of the cell types with the most protein staining.
+HPAStain.R is an [Bioconductor R package](http://www.bioconductor.org/packages/release/bioc/html/HPAStainR.html)/[Shiny app](https://32tim32.shinyapps.io/HPAStainR/) used to query the Human Protein Atlas for staining data. The purpose of this tool is to test if a list of proteins/genes is associated with a certain cell type in a HPA tested tissue. E.g. you have a list of protein coding genes from a differential expression single cell analysis and want to see if these proteins are associated with a known cell type. Instead of querying HPA multiple times you can load your list in HPAStainR which will return a ranked table of the cell types with the most protein staining.
 
-The package has officially been accepted at Bioconductor, and package deveopment still continues at https://github.com/tnieuwe/HPAStainR, there will be no further updates to the HPAStainR package here, this github exists to now host the experiment used in the HPAStainR paper.
+The package has officially been accepted at Bioconductor, and package development still continues at https://github.com/tnieuwe/HPAStainR, there will be no further updates to the HPAStainR package here, this github exists to now host the experiments used in the [HPAStainR paper](https://f1000research.com/articles/9-1210).
 
 I am keeping this repository as I believe the README is a useful supplement and this repository holds the data that will be submitted hopefully as a paper.
 
@@ -33,7 +33,7 @@ Normal Tissue: https://www.proteinatlas.org/download/normal_tissue.tsv.zip
 
 Cancer Tissue: https://www.proteinatlas.org/download/pathology.tsv.zip
 
-*Note*: these are large files but required to run HPAStainR, HPAStainR also has built in functions to do this.
+*Note*: these are large files but required to run HPAStainR, HPAStainR also has built in functions to do this. These might be later depricated as we incorporate data from [hpar](https://www.bioconductor.org/packages/release/bioc/html/hpar.html)
 
 ## Files for Paper Analysis
 
@@ -44,12 +44,6 @@ Cancer Tissue: https://www.proteinatlas.org/download/pathology.tsv.zip
   * Recapitulation of [McCall et. al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5011060/) results
 * *HPAStainR_paper_analysis.html:* The html printout of the Rmarkdown file.
 * *data_out:* Where the output of the figures and CSVs from HPAStainR_paper_analysis.rmd go.
-
-### Other folders
-
-* *old_versions*: Holds previous package versions and analyses
-* *old vignette*: Holds previous vignettes, most up to date vignette is in the Bioconductor version
-* *old_files*: General old outputs that are no longer relevant to the main paper
 
 ## Built With
 
@@ -72,7 +66,7 @@ Cancer Tissue: https://www.proteinatlas.org/download/pathology.tsv.zip
 * Thank you Matt McCall and Zach Brehm for reviewing the code - [mccallm](https://github.com/mccallm) & [zachbrehm](https://github.com/zachbrehm)
 * Human Protein Atlas for data availability and data structure
 * PurpleBooth for the README template - [PurpleBooth](https://gist.github.com/PurpleBooth/)
-* The people at Bioconductor for reviewing my tool
+* The people at Bioconductor and F1000 for reviewing my tool/paper
 
 # License and DOI
 Artistic-2.0
