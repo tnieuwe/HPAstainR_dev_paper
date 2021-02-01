@@ -45,12 +45,6 @@ Cancer Tissue: https://www.proteinatlas.org/download/pathology.tsv.zip
 * *HPAStainR_paper_analysis.html:* The html printout of the Rmarkdown file.
 * *data_out:* Where the output of the figures and CSVs from HPAStainR_paper_analysis.rmd go.
 
-### Other folders
-
-* *old_versions*: Holds previous package versions and analyses
-* *old vignette*: Holds previous vignettes, most up to date vignette is in the Bioconductor version
-* *old_files*: General old outputs that are no longer relevant to the main paper
-
 ## Built With
 
 * [dplyr](https://dplyr.tidyverse.org/) - Data.frame manipulation
