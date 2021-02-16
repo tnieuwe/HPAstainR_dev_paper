@@ -14,18 +14,20 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Install HPAStainR and load other packages and functions
 
 ```{r results="hide", message=FALSE}
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-# The following initializes usage of Bioc devel
-BiocManager::install(version='devel')
-
-BiocManager::install("HPAStainR")
+# if (!requireNamespace("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# 
+# # The following initializes usage of Bioc devel
+# if (!requireNamespace("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# 
+# BiocManager::install("HPAStainR")
 
 library(tidyverse)
 library(HPAStainR)
 library(R.utils)
 library(ggpubr)
+library(hpar)
 getURL <- function(URL, FUN, ..., N.TRIES = 1L) {
         N.TRIES <- as.integer(N.TRIES)
         stopifnot(length(N.TRIES) == 1L, !is.na(N.TRIES))
@@ -52,10 +54,15 @@ getURL <- function(URL, FUN, ..., N.TRIES = 1L) {
 
 Using HPAStainR's built in functions
 ```{r}
+## Required to use hpar data instead of HPA_downloader to keep the same results
+## as HPA has updated
+## hpa_dat <- HPAStainR::HPA_data_downloader("normal",save_file = F)
+##cancer_dat <- HPAStainR::HPA_data_downloader("cancer",save_file = F)
+data(hpaNormalTissue)
+data(hpaCancer)
 
-#hpa_dat <- read.table("../normal_tissue.tsv", sep = '\t', header = TRUE, stringsAsFactors = F)
-hpa_dat <- HPAStainR::HPA_data_downloader("normal",save_file = F)
-cancer_dat <- HPAStainR::HPA_data_downloader("cancer",save_file = F)
+hpa_dat <- hpaNormalTissue
+cancer_dat <- hpaCancer
 ```
 
 
@@ -752,54 +759,54 @@ This ended up not working so I'll just do them as a CSV
 
 #Ext table 1
 write.csv(hpa_dat_sum_out,
-           file = "data_out/exteneded_table_1.csv",
+           file = "data_out/extended_table_1.csv",
             row.names = F)
 #Ext table 2
 write.csv(supp_table_2,
-           file = "data_out/exteneded_table_2.csv",
+           file = "data_out/extended_table_2.csv",
            row.names = F)
 #Ext table 3
 write.csv(cancer_sub_table,
-           file = "data_out/exteneded_table_3.csv",
+           file = "data_out/extended_table_3.csv",
           row.names = F)
 #Ext table 4
 write.csv(final_df,
-           file = "data_out/exteneded_table_4.csv",
+           file = "data_out/extended_table_4.csv",
            row.names = F)
 #Ext table 5
 write.csv(supp_table_4,
-           file = "data_out/exteneded_table_5.csv",
+           file = "data_out/extended_table_5.csv",
            row.names = F)
 
 #Ext table 6
 write.csv(supp_table_5,
-           file = "data_out/exteneded_table_6.csv", row.names = F)
+           file = "data_out/extended_table_6.csv", row.names = F)
 
 
 # #Ext table 1
 # write.xlsx(hpa_dat_sum_out,
-#            file = "data_out/exteneded_tables.xlsx",
+#            file = "data_out/extended_tables.xlsx",
 #            sheetName = "Extended Table 1")
 # #Ext table 2
 # write.xlsx(supp_table_2,
-#            file = "data_out/exteneded_tables.xlsx",
+#            file = "data_out/extended_tables.xlsx",
 #            sheetName = "Extended Table 2", append=TRUE)
 # #Ext table 3
 # write.xlsx(cancer_sub_table,
-#            file = "data_out/exteneded_tables.xlsx",
+#            file = "data_out/extended_tables.xlsx",
 #            sheetName = "Extended Table 3", append=TRUE)
 # #Ext table 4
 # write.xlsx(final_df,
-#            file = "data_out/exteneded_tables.xlsx",
+#            file = "data_out/extended_tables.xlsx",
 #            sheetName = "Extended Table 4", append=TRUE)
 # #Ext table 5
 # write.xlsx(supp_table_4,
-#            file = "data_out/exteneded_tables.xlsx",
+#            file = "data_out/extended_tables.xlsx",
 #            sheetName = "Extended Table 5", append=TRUE)
 # 
 # #Ext table 6
 # write.xlsx(supp_table_5,
-#            file = "data_out/exteneded_tables.xlsx",
+#            file = "data_out/extended_tables.xlsx",
 #            sheetName = "Extended Table 6", append=TRUE)
 
 
@@ -887,3 +894,211 @@ ggarrange(low_plot, normal_plot, high_plot, nrow = 3)
 
 ```
 
+Reviewer 3 Concerns about the distribution of the Staining Score.
+```{r}
+
+hpa_dat_plot <- hpa_dat
+hpa_dat_plot$Level <- factor(hpa_dat_plot$Level, levels = c("Not detected",
+                                                            "Low",
+                                                            "Medium",
+                                                            "High",
+                                                            "N/A"))
+
+
+ggplot(hpa_dat_plot, aes(x = Level)) +
+  geom_bar()
+
+
+table(hpa_dat_plot$Level)
+
+```
+Permute 1000 random HPAStainR runs? Take all staining scores and then also only
+the top 10 staining scores and see what the distribution looks like.
+
+```{r}
+top_10_stain <- c()
+all_stain <- c()
+list_of_genes <- unique(hpa_dat$Gene.name)
+set.seed(123)
+for (index in seq(1000)) {
+  cur_genes <- sample(list_of_genes, size = 10)
+  stain_out <- HPAStainR(cur_genes,hpa_dat = hpa_dat,cancer_analysis = "normal",stringency = "normal")
+  top_10_stain <- append(top_10_stain, head(stain_out$staining_score, n = 10))
+  all_stain <- append(all_stain, stain_out$staining_score)
+}
+
+top_10_10_gene <- top_10_stain
+all_stain_10_gene <- all_stain
+hist(top_10_10_gene)
+hist(all_stain_10_gene)
+
+
+
+
+## Redo with 20=5
+top_10_stain <- c()
+all_stain <- c()
+list_of_genes <- unique(hpa_dat$Gene.name)
+set.seed(123)
+for (index in seq(1000)) {
+  cur_genes <- sample(list_of_genes, size = 25)
+  stain_out <- HPAStainR(cur_genes,hpa_dat = hpa_dat,cancer_analysis = "normal",stringency = "normal")
+  top_10_stain <- append(top_10_stain, head(stain_out$staining_score, n = 10))
+  all_stain <- append(all_stain, stain_out$staining_score)
+}
+
+
+top_10_25_gene <- top_10_stain
+all_stain_25_gene <- all_stain
+hist(top_10_25_gene)
+hist(all_stain_25_gene)
+
+##Redo with 50
+top_10_stain <- c()
+all_stain <- c()
+list_of_genes <- unique(hpa_dat$Gene.name)
+set.seed(123)
+for (index in seq(1000)) {
+  cur_genes <- sample(list_of_genes, size = 50)
+  stain_out <- HPAStainR(cur_genes,hpa_dat = hpa_dat,cancer_analysis = "normal",stringency = "normal")
+  top_10_stain <- append(top_10_stain, head(stain_out$staining_score, n = 10))
+  all_stain <- append(all_stain, stain_out$staining_score)
+}
+
+top_10_50_gene <- top_10_stain
+all_stain_50_gene <- all_stain
+hist(top_10_50_gene)
+hist(all_stain_50_gene)
+
+## Redo with 100
+top_10_stain <- c()
+all_stain <- c()
+list_of_genes <- unique(hpa_dat$Gene.name)
+set.seed(123)
+for (index in seq(1000)) {
+  cur_genes <- sample(list_of_genes, size = 100)
+  stain_out <- HPAStainR(cur_genes,hpa_dat = hpa_dat,cancer_analysis = "normal",stringency = "normal")
+  top_10_stain <- append(top_10_stain, head(stain_out$staining_score, n = 10))
+  all_stain <- append(all_stain, stain_out$staining_score)
+}
+
+top_10_100_gene <- top_10_stain
+all_stain_100_gene <- all_stain
+hist(top_10_100_gene)
+hist(all_stain_100_gene)
+```
+
+```{r}
+## Make histograms of top 10
+
+all_10_plots <- ggplot(data.frame(all_stain_10_gene), aes(all_stain_10_gene)) +
+                  geom_histogram(fill = "grey", color = "black") +
+                  theme_classic() +
+                  labs(title = "All Staining Scores of 1,000\npermutations of 10 random genes",
+                       x = "Staining Score")
+
+all_25_plots <- ggplot(data.frame(all_stain_25_gene), aes(all_stain_25_gene)) +
+                  geom_histogram(fill = "grey", color = "black") +
+                  theme_classic() +
+                  labs(title = "All Staining Scores of 1,000\npermutations of 25 random genes",
+                       x = "Staining Score")
+
+all_50_plots <- ggplot(data.frame(all_stain_50_gene), aes(all_stain_50_gene)) +
+                  geom_histogram(fill = "grey", color = "black") +
+                  theme_classic() +
+                  labs(title = "All Staining Scores of 1,000\npermutations of 50 random genes",
+                       x = "Staining Score")
+
+all_100_plots <- ggplot(data.frame(all_stain_100_gene), aes(all_stain_100_gene)) +
+                  geom_histogram(fill = "grey", color = "black") +
+                  theme_classic() +
+                  labs(title = "All Staining Scores of 1,000\npermutations of 100 random genes",
+                       x = "Staining Score")
+
+ggarrange(all_10_plots, all_25_plots, all_50_plots, all_100_plots)
+```
+
+```{r}
+## Make histograms of top 10
+
+top_10_plots <- ggplot(data.frame(top_10_10_gene), aes(top_10_10_gene)) +
+                  geom_histogram(fill = "grey", color = "black") +
+                  theme_classic() +
+                  labs(title = "Top 10 Staining Scores of 1,000\npermutations of 10 random genes",
+                       x = "Staining Score")
+
+top_25_plots <- ggplot(data.frame(top_10_25_gene), aes(top_10_25_gene)) +
+                  geom_histogram(fill = "grey", color = "black") +
+                  theme_classic() +
+                  labs(title = "Top 10 Staining Scores of 1,000\npermutations of 25 random genes",
+                       x = "Staining Score")
+
+top_50_plots <- ggplot(data.frame(top_10_50_gene), aes(top_10_50_gene)) +
+                  geom_histogram(fill = "grey", color = "black") +
+                  theme_classic() +
+                  labs(title = "Top 10 Staining Scores of 1,000\npermutations of 50 random genes",
+                       x = "Staining Score")
+
+top_100_plots <- ggplot(data.frame(top_10_100_gene), aes(top_10_100_gene)) +
+                  geom_histogram(fill = "grey", color = "black") +
+                  theme_classic() +
+                  labs(title = "Top 10 Staining Scores of 1,000\npermutations of 100 random genes",
+                       x = "Staining Score")
+
+ggarrange(top_10_plots, top_25_plots, top_50_plots, top_100_plots)
+```
+
+
+Overall it appears that the data is relatively normal, shifting downards depending on the N of genes used in the analysis.
+
+
+
+Comparing HPA_data_downloader vs hpar based on reviewer 2 comments
+
+```{r}
+HPA_data <- HPA_data_downloader(tissue_type = "both", save_file  = F)
+HPA_out <- HPAStainR(c('PRSS1', 'PNLIP', 'CELA3A', 'PRL'),
+                     HPA_data$hpa_dat,
+                     HPA_data$cancer_dat,
+                     'both')
+```
+
+```{r}
+library(hpar)
+packageVersion("hpar")
+data(hpaCancer)
+data(hpaNormalTissue)
+all.equal(hpaNormalTissue, HPA_data$hpa_dat)
+all.equal(hpaCancer, HPA_data$cancer_dat, check.attributes = FALSE) ## different colnames only
+HPA_out2 <- HPAStainR(c('PRSS1', 'PNLIP', 'CELA3A', 'PRL'),
+                      hpaNormalTissue,
+                      hpaCancer,
+                      'both')
+```
+
+Running normal only
+```{r}
+HPA_out_norm <- HPAStainR(c('PRSS1', 'PNLIP', 'CELA3A', 'PRL'),
+                      HPA_data$hpa_dat,
+                      HPA_data$cancer_dat,
+                      'normal')
+
+
+HPA_out_norm2 <- HPAStainR(c('PRSS1', 'PNLIP', 'CELA3A', 'PRL'),
+                      hpaNormalTissue,
+                      hpaCancer,
+                      'normal')
+p_val_vect <- c()
+
+for (i in seq(100)) {
+  HPA_out_norm <- HPAStainR(c('PRSS1', 'PNLIP', 'CELA3A', 'PRL'),
+                      HPA_data$hpa_dat,
+                      HPA_data$cancer_dat,
+                      'normal')
+ p_val_vect <- append(p_val_vect, HPA_out_norm$p_val_adj[1])
+}
+## The simulated p-values are resulting with
+```
+
+
+We noted the difference between `hpar` results and `HPA_data_downloader()` from Reviewer 2 was most caused by the simulated p-values of chisq.test, and so we now have the analysis run with Fisher's Exact Test
