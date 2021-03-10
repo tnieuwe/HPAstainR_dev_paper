@@ -994,28 +994,29 @@ hist(all_stain_100_gene)
 all_10_plots <- ggplot(data.frame(all_stain_10_gene), aes(all_stain_10_gene)) +
                   geom_histogram(fill = "grey", color = "black") +
                   theme_classic() +
-                  labs(title = "All Staining Scores of 1,000\npermutations of 10 random genes",
+                  labs(title = "10 Genes",
                        x = "Staining Score")
 
 all_25_plots <- ggplot(data.frame(all_stain_25_gene), aes(all_stain_25_gene)) +
                   geom_histogram(fill = "grey", color = "black") +
                   theme_classic() +
-                  labs(title = "All Staining Scores of 1,000\npermutations of 25 random genes",
+                  labs(title = "25 Genes",
                        x = "Staining Score")
 
 all_50_plots <- ggplot(data.frame(all_stain_50_gene), aes(all_stain_50_gene)) +
                   geom_histogram(fill = "grey", color = "black") +
                   theme_classic() +
-                  labs(title = "All Staining Scores of 1,000\npermutations of 50 random genes",
+                  labs(title = "50 Genes",
                        x = "Staining Score")
 
 all_100_plots <- ggplot(data.frame(all_stain_100_gene), aes(all_stain_100_gene)) +
                   geom_histogram(fill = "grey", color = "black") +
                   theme_classic() +
-                  labs(title = "All Staining Scores of 1,000\npermutations of 100 random genes",
+                  labs(title = "100 Genes",
                        x = "Staining Score")
 
 ggarrange(all_10_plots, all_25_plots, all_50_plots, all_100_plots)
+ggsave("data_out/extended_fig_2_all_perm_plots.pdf", width = 7, height = 6)
 ```
 
 ```{r}
@@ -1024,28 +1025,29 @@ ggarrange(all_10_plots, all_25_plots, all_50_plots, all_100_plots)
 top_10_plots <- ggplot(data.frame(top_10_10_gene), aes(top_10_10_gene)) +
                   geom_histogram(fill = "grey", color = "black") +
                   theme_classic() +
-                  labs(title = "Top 10 Staining Scores of 1,000\npermutations of 10 random genes",
+                  labs(title = "10 Genes",
                        x = "Staining Score")
 
 top_25_plots <- ggplot(data.frame(top_10_25_gene), aes(top_10_25_gene)) +
                   geom_histogram(fill = "grey", color = "black") +
                   theme_classic() +
-                  labs(title = "Top 10 Staining Scores of 1,000\npermutations of 25 random genes",
+                  labs(title = "25 Genes",
                        x = "Staining Score")
 
 top_50_plots <- ggplot(data.frame(top_10_50_gene), aes(top_10_50_gene)) +
                   geom_histogram(fill = "grey", color = "black") +
                   theme_classic() +
-                  labs(title = "Top 10 Staining Scores of 1,000\npermutations of 50 random genes",
+                  labs(title = "50 Genes",
                        x = "Staining Score")
 
 top_100_plots <- ggplot(data.frame(top_10_100_gene), aes(top_10_100_gene)) +
                   geom_histogram(fill = "grey", color = "black") +
                   theme_classic() +
-                  labs(title = "Top 10 Staining Scores of 1,000\npermutations of 100 random genes",
+                  labs(title = "100 Genes",
                        x = "Staining Score")
 
 ggarrange(top_10_plots, top_25_plots, top_50_plots, top_100_plots)
+ggsave("data_out/extended_fig_1_top_ten_perm_plots.pdf", width = 7, height = 6)
 ```
 
 
